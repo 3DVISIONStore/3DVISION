@@ -3,20 +3,22 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <link rel="icon" type="image/png" href="https://3dvision.store/logo.png">
+  <link rel="icon" type="image/png" href="logo.png">
   <title>3DVISION | خدمات الطباعة ثلاثية الأبعاد والتصميم الهندسي</title>
   <meta name="description" content="خدمات طباعة 3D وتصميم هندسي ونماذج أولية عالية الدقة.">
-  <!-- Open Graph / صورة معاينة الواتساب والفيسبوك -->
+  <!-- Open Graph / Link Preview Meta Tags -->
+  <meta property="og:title" content="3DVISION - 3D Printing & Engineering Solutions">
+  <meta property="og:description" content="خدمات طباعة ثلاثية الأبعاد ونماذج هندسية متطورة.">
+  <meta property="og:url" content="https://3dvisionstore.github.io/">
   <meta property="og:type" content="website">
-  <meta property="og:title" content="3DVISION | 3D Printing & Engineering Solutions">
-  <meta property="og:description" content="خدمات الطباعة ثلاثية الأبعاد والحلول الهندسية">
-  <meta property="og:image" content="https://3dvision.store/preview-image.png">
-  <meta property="og:url" content="https://3dvision.store">
   <meta property="og:site_name" content="3DVISION store">
+  <meta property="og:image" id="ogImage" content="">
   <meta property="og:locale" content="ar_EG">
   <!-- Twitter Card -->
   <meta name="twitter:card" content="summary_large_image">
-  <meta name="twitter:image" content="https://3dvision.store/preview-image.png">
+  <meta name="twitter:title" content="3DVISION - 3D Printing & Engineering Solutions">
+  <meta name="twitter:description" content="خدمات طباعة ثلاثية الأبعاد ونماذج هندسية متطورة.">
+  <meta name="twitter:image" id="twitterImage" content="">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link rel="preconnect" href="https://dvision-website-10140-default-rtdb.firebaseio.com">
@@ -395,7 +397,13 @@
       </div>
 
       <div class="relative z-10 text-center px-4 flex flex-col items-center">
-        <img id="heroLogo" src="logo.png" alt="برق بنزين" class="w-24 h-24 sm:w-32 sm:h-32 rounded-full object-contain mb-6 sm:mb-8">
+        <img id="heroLogo" 
+     src="logo.webp" 
+     alt="3D Vision Logo" 
+     width="128" 
+     height="128" 
+     class="w-24 h-24 sm:w-32 sm:h-32 rounded-full object-contain mb-6 sm:mb-8" 
+     loading="eager" />
         <h1 id="heroTitle" class="gold-text text-5xl sm:text-6xl md:text-7xl lg:text-8xl font-black mb-3 sm:mb-4">3DVISION store</h1>
         <p id="heroSubtitle" class="text-white/50 text-xs sm:text-sm md:text-base tracking-[0.3em] uppercase mb-4 sm:mb-6">3D Automotive Art</p>
         <p class="text-white/60 text-sm sm:text-base md:text-lg max-w-xl mb-8 sm:mb-10 leading-relaxed">
