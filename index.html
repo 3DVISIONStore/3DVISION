@@ -395,6 +395,79 @@
       color: #e2b04a;
       font-weight: 600;
     }
+    /* === Auth Modal === */
+    .auth-modal-overlay {
+      position: fixed; inset: 0; background: rgba(0,0,0,0.7); z-index: 150;
+      display: flex; align-items: center; justify-content: center;
+      opacity: 0; pointer-events: none; transition: opacity 0.3s;
+      backdrop-filter: blur(6px);
+    }
+    .auth-modal-overlay.active { opacity: 1; pointer-events: all; }
+    .auth-modal-box {
+      background: #141414; border: 1px solid rgba(226,176,74,0.2); border-radius: 16px;
+      padding: 2rem; width: 90%; max-width: 400px; position: relative;
+      transform: translateY(20px); transition: transform 0.3s;
+    }
+    .auth-modal-overlay.active .auth-modal-box { transform: translateY(0); }
+    .auth-tabs { display: flex; gap: 0; margin-bottom: 1.5rem; border-bottom: 1px solid rgba(255,255,255,0.08); }
+    .auth-tab {
+      flex: 1; text-align: center; padding: 0.6rem 0; font-size: 0.9rem; cursor: pointer;
+      color: #888; border-bottom: 2px solid transparent; transition: all 0.2s;
+      background: none; border-top: none; border-left: none; border-right: none;
+    }
+    .auth-tab.active { color: #e2b04a; border-bottom-color: #e2b04a; }
+    .auth-tab:hover { color: #ccc; }
+    .auth-input {
+      width: 100%; padding: 0.7rem 1rem; border-radius: 10px; border: 1px solid rgba(255,255,255,0.1);
+      background: rgba(255,255,255,0.05); color: #fff; font-size: 0.9rem; outline: none;
+      transition: border-color 0.2s; box-sizing: border-box; margin-bottom: 0.75rem;
+    }
+    .auth-input:focus { border-color: #e2b04a; }
+    .auth-input::placeholder { color: #666; }
+    .auth-btn {
+      width: 100%; padding: 0.75rem; border-radius: 10px; border: none;
+      background: linear-gradient(135deg, #e2b04a, #c9962e); color: #000;
+      font-size: 0.95rem; font-weight: 700; cursor: pointer; transition: all 0.2s;
+      margin-top: 0.5rem;
+    }
+    .auth-btn:hover { background: linear-gradient(135deg, #f0c45e, #e2b04a); transform: translateY(-1px); }
+    .auth-btn:disabled { opacity: 0.6; cursor: not-allowed; transform: none; }
+    .auth-error { color: #ef4444; font-size: 0.8rem; text-align: center; min-height: 1.2rem; margin-top: 0.5rem; }
+    .auth-close {
+      position: absolute; top: 0.75rem; left: 0.75rem; background: none; border: none;
+      color: #888; cursor: pointer; padding: 0.25rem; font-size: 1.2rem; line-height: 1;
+    }
+    .auth-close:hover { color: #fff; }
+    /* === User Dropdown === */
+    .user-dropdown {
+      position: absolute; top: 100%; left: 0; margin-top: 0.5rem; background: #1a1a1a;
+      border: 1px solid rgba(226,176,74,0.2); border-radius: 12px; padding: 0.5rem;
+      min-width: 180px; box-shadow: 0 8px 32px rgba(0,0,0,0.5); z-index: 60;
+      display: none;
+    }
+    .user-dropdown.show { display: block; }
+    .user-dropdown-item {
+      display: flex; align-items: center; gap: 0.5rem; padding: 0.5rem 0.75rem;
+      border-radius: 8px; font-size: 0.85rem; color: #ccc; cursor: pointer;
+      border: none; background: none; width: 100%; text-align: right;
+      transition: background 0.15s;
+    }
+    .user-dropdown-item:hover { background: rgba(255,255,255,0.05); color: #fff; }
+    .user-dropdown-item.danger { color: #ef4444; }
+    .user-dropdown-item.danger:hover { background: rgba(239,68,68,0.1); }
+    .user-avatar-btn {
+      width: 34px; height: 34px; border-radius: 50%; border: 2px solid #e2b04a;
+      background: rgba(226,176,74,0.15); color: #e2b04a; font-weight: 700;
+      font-size: 0.85rem; cursor: pointer; display: flex; align-items: center;
+      justify-content: center; transition: all 0.2s; position: relative;
+    }
+    .user-avatar-btn:hover { background: rgba(226,176,74,0.25); transform: scale(1.05); }
+    [data-theme="light"] .auth-modal-box { background: #fff; border-color: rgba(0,0,0,0.1); }
+    [data-theme="light"] .auth-input { background: #f5f5f5; border-color: #ddd; color: #222; }
+    [data-theme="light"] .auth-input:focus { border-color: #e2b04a; }
+    [data-theme="light"] .user-dropdown { background: #fff; border-color: #ddd; box-shadow: 0 8px 32px rgba(0,0,0,0.12); }
+    [data-theme="light"] .user-dropdown-item { color: #555; }
+    [data-theme="light"] .user-dropdown-item:hover { background: #f0f0f0; color: #222; }
   </style>
   <!-- Three.js STL Viewer -->
   <script type="importmap">
@@ -452,6 +525,22 @@
                 <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/>
               </svg>
             </button>
+            <!-- User Auth Button -->
+            <div style="position:relative" id="desktopUserArea">
+              <div id="desktopUserBtn" onclick="handleDesktopUserClick()">
+                <button id="desktopUserIcon" class="p-2 rounded-lg bg-white/5 hover:bg-white/10 transition-colors" title="تسجيل الدخول" style="display:flex">
+                  <svg class="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+                </button>
+                <button id="desktopUserAvatar" class="user-avatar-btn" style="display:none"></button>
+              </div>
+              <div class="user-dropdown" id="desktopUserDropdown">
+                <div id="desktopUserName" style="padding:0.4rem 0.75rem;font-weight:600;font-size:0.85rem;color:#e2b04a;border-bottom:1px solid rgba(255,255,255,0.06);margin-bottom:0.25rem"></div>
+                <button class="user-dropdown-item danger" onclick="userLogout()">
+                  <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>
+                  تسجيل الخروج
+                </button>
+              </div>
+            </div>
             <!-- Admin Button -->
             <button onclick="openAdmin()" class="p-2 rounded-lg bg-white/5 hover:bg-white/10 transition-colors" title="لوحة التحكم">
               <svg class="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
@@ -485,6 +574,12 @@
           <a href="#categories" class="block text-white/80 hover:text-gold py-2 transition-colors" onclick="closeMenu()">المجموعات</a>
           <a href="#products" class="block text-white/80 hover:text-gold py-2 transition-colors" onclick="closeMenu()">المنتجات</a>
           <a href="#contact" class="block text-white/80 hover:text-gold py-2 transition-colors" onclick="closeMenu()">تواصل معنا</a>
+          <div id="mobileUserArea">
+            <button id="mobileUserBtn" onclick="handleMobileUserClick();" class="flex items-center gap-2 text-white/80 hover:text-gold py-2 transition-colors w-full text-right">
+              <svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+              <span id="mobileUserBtnText">تسجيل الدخول</span>
+            </button>
+          </div>
           <button onclick="openAdmin(); closeMenu();" class="flex items-center gap-2 text-white/80 hover:text-gold py-2 transition-colors w-full text-right">
             <svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
               <circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/>
@@ -1108,6 +1203,33 @@
 .infill-opt.active { border-color: #e2b04a !important; background: rgba(226,176,74,0.1) !important; color: #e2b04a !important; }
 </style>
 
+<!-- User Auth Modal -->
+<div class="auth-modal-overlay" id="authModalOverlay" onclick="if(event.target===this)hideAuthModal()">
+  <div class="auth-modal-box">
+    <button class="auth-close" onclick="hideAuthModal()">&times;</button>
+    <div class="auth-tabs">
+      <button class="auth-tab active" id="authTabLogin" onclick="switchAuthTab('login')">تسجيل الدخول</button>
+      <button class="auth-tab" id="authTabRegister" onclick="switchAuthTab('register')">حساب جديد</button>
+    </div>
+    <!-- Login Form -->
+    <div id="authLoginForm">
+      <input type="text" class="auth-input" id="authLoginPhone" placeholder="رقم الهاتف" inputmode="tel" autocomplete="tel">
+      <input type="password" class="auth-input" id="authLoginPassword" placeholder="كلمة المرور" autocomplete="current-password">
+      <button class="auth-btn" id="authLoginBtn" onclick="userLogin()">تسجيل الدخول</button>
+      <div class="auth-error" id="authLoginError"></div>
+    </div>
+    <!-- Register Form -->
+    <div id="authRegisterForm" style="display:none">
+      <input type="text" class="auth-input" id="authRegName" placeholder="الاسم">
+      <input type="text" class="auth-input" id="authRegPhone" placeholder="رقم الهاتف" inputmode="tel" autocomplete="tel">
+      <input type="password" class="auth-input" id="authRegPassword" placeholder="كلمة المرور" autocomplete="new-password">
+      <input type="password" class="auth-input" id="authRegConfirm" placeholder="تأكيد كلمة المرور" autocomplete="new-password">
+      <button class="auth-btn" id="authRegBtn" onclick="userRegister()">إنشاء حساب</button>
+      <div class="auth-error" id="authRegError"></div>
+    </div>
+  </div>
+</div>
+
 <div id="adminPanel" class="hidden">
   <div id="adminLogin">
     <div class="login-card">
@@ -1150,6 +1272,7 @@
         <a class="nav-item" data-tab="promo" onclick="switchAdminTab('promo')"><svg fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24"><path d="M20.59 13.41l-7.17 7.17a2 2 0 0 1-2.83 0L2 12V2h10l8.59 8.59a2 2 0 0 1 0 2.82z"/><line x1="7" y1="7" x2="7.01" y2="7"/></svg>بانر العروض</a>
         <a class="nav-item" data-tab="materials" onclick="switchAdminTab('materials')"><svg fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24"><path d="M12 2L2 7l10 5 10-5-10-5z"/><path d="M2 17l10 5 10-5"/><path d="M2 12l10 5 10-5"/></svg>تسعير المواد</a>
         <a class="nav-item" data-tab="stlfiles" onclick="switchAdminTab('stlfiles')"><svg fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg>ملفات STL</a>
+        <a class="nav-item" data-tab="customers" onclick="switchAdminTab('customers')"><svg fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>العملاء</a>
         <a class="nav-item" data-tab="backup" onclick="switchAdminTab('backup')"><svg fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>النسخ الاحتياطي</a>
       </nav>
       <div class="admin-content">
@@ -1161,6 +1284,13 @@
             <div class="admin-form-group"><label>اسم الموقع (إنجليزي)</label><input type="text" id="settingSiteNameEn"></div>
             <div class="admin-form-group"><label>شعار الموقع</label><div class="logo-preview-area" id="logoPreviewArea"><svg width="32" height="32" fill="none" stroke="#555" stroke-width="1.5" viewBox="0 0 24 24"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><path d="M21 15l-5-5L5 21"/></svg></div><input type="file" id="logoFileInput" accept="image/*" onchange="handleLogoUpload(event)" style="margin-bottom:0.5rem"><br><button class="admin-btn admin-btn-danger admin-btn-sm" onclick="removeLogo()">حذف اللوجو</button></div>
             <div class="admin-form-group"><label>المظهر الافتراضي</label><select id="settingDefaultTheme"><option value="dark">داكن</option><option value="light">فاتح</option></select></div>
+            <div class="admin-form-group">
+              <label>نسبة السابورت والهدر (STL)</label>
+              <div style="display:flex;align-items:center;gap:0.5rem">
+                <input type="number" id="settingSupportWaste" min="0" max="100" step="1" style="width:80px;text-align:center" placeholder="15">
+                <span style="color:#888;font-size:0.85rem">% — تُضاف على سعر طباعة STL كضمان للسابورت والهدر</span>
+              </div>
+            </div>
             <button class="admin-btn admin-btn-primary" onclick="saveSettings()"><svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" viewBox="0 0 24 24"><path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"/><polyline points="17 21 17 13 7 13 7 21"/><polyline points="7 3 7 8 15 8"/></svg>حفظ الإعدادات</button>
           </div>
         </div>
@@ -1217,6 +1347,11 @@
           <div class="section-header"><h2>ملفات STL المرفوعة</h2><button class="admin-btn" onclick="renderAdminSTLFiles()" style="display:flex;align-items:center;gap:0.5rem;border:1px solid #e2b04a;color:#e2b04a"><svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><polyline points="23 4 23 10 17 10"/><path d="M20.49 15a9 9 0 1 1-2.12-9.36L23 10"/></svg>تحديث</button></div>
           <p style="color:#888;font-size:0.78rem;margin-bottom:1rem">ملفات STL اللي العملاء رفعوها عند طلب طباعة 3D مخصص — متاحة لمدة 24 ساعة فقط</p>
           <div id="adminSTLFilesList"></div>
+        </div>
+        <div id="adminTabCustomers" class="admin-tab-content" style="display:none">
+          <div class="section-header"><h2>بيانات العملاء</h2><button class="admin-btn" onclick="renderAdminCustomers()" style="display:flex;align-items:center;gap:0.5rem;border:1px solid #e2b04a;color:#e2b04a"><svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><polyline points="23 4 23 10 17 10"/><path d="M20.49 15a9 9 0 1 1-2.12-9.36L23 10"/></svg>تحديث</button></div>
+          <p style="color:#888;font-size:0.78rem;margin-bottom:1rem">الحسابات المسجلة وملفات STL المرفوعة لكل عميل</p>
+          <div id="adminCustomersList"></div>
         </div>
       </div>
     </div>
@@ -1735,19 +1870,43 @@
 
     function trackVisitor() {
       try {
-        if (!data.stats) data.stats = { visitorCount: 0, dailyVisits: {}, productClicks: {} };
+        if (!data.stats) data.stats = { visitorCount: 0, dailyVisits: {}, productClicks: {}, dailyUsers: {}, productClicksByUser: {} };
         data.stats.visitorCount = (data.stats.visitorCount || 0) + 1;
         var today = new Date().toISOString().split('T')[0];
         data.stats.dailyVisits[today] = (data.stats.dailyVisits[today] || 0) + 1;
+        // Track unique daily users
+        if (!data.stats.dailyUsers) data.stats.dailyUsers = {};
+        if (!data.stats.dailyUsers[today]) data.stats.dailyUsers[today] = [];
+        var uid = getUserId();
+        var visitorKey = uid || 'guest';
+        if (data.stats.dailyUsers[today].indexOf(visitorKey) === -1) {
+          data.stats.dailyUsers[today].push(visitorKey);
+        }
+        // If user is logged in, increment their visit count
+        if (uid) {
+          fetch(FIREBASE_DB_URL + '/users/' + uid + '/visitCount.json').then(function(r) { return r.json(); }).then(function(count) {
+            fetch(FIREBASE_DB_URL + '/users/' + uid + '/visitCount.json', {
+              method: 'PUT', headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify((count || 0) + 1)
+            });
+          }).catch(function() {});
+        }
         _saveStats();
       } catch (e) {}
     }
 
     function trackProductClick(productId) {
       try {
-        if (!data.stats) data.stats = { visitorCount: 0, dailyVisits: {}, productClicks: {} };
+        if (!data.stats) data.stats = { visitorCount: 0, dailyVisits: {}, productClicks: {}, dailyUsers: {}, productClicksByUser: {} };
         if (!data.stats.productClicks) data.stats.productClicks = {};
         data.stats.productClicks[productId] = (data.stats.productClicks[productId] || 0) + 1;
+        // If user is logged in, track per-user clicks
+        var uid = getUserId();
+        if (uid) {
+          if (!data.stats.productClicksByUser) data.stats.productClicksByUser = {};
+          if (!data.stats.productClicksByUser[uid]) data.stats.productClicksByUser[uid] = {};
+          data.stats.productClicksByUser[uid][productId] = (data.stats.productClicksByUser[uid][productId] || 0) + 1;
+        }
         _saveStats();
       } catch (e) {}
     }
@@ -2539,7 +2698,7 @@
 
     // Admin Nav
     var adminCurrentTab = 'dashboard';
-    var adminTabLabels = { dashboard:'الرئيسية', settings:'إعدادات الموقع', contacts:'التواصل', products:'المنتجات', categories:'التصنيفات', materials:'تسعير المواد', stlfiles:'ملفات STL', announcements:'الإعلانات', promo:'بانر العروض', backup:'النسخ الاحتياطي' };
+    var adminTabLabels = { dashboard:'الرئيسية', settings:'إعدادات الموقع', contacts:'التواصل', products:'المنتجات', categories:'التصنيفات', materials:'تسعير المواد', stlfiles:'ملفات STL', announcements:'الإعلانات', promo:'بانر العروض', customers:'العملاء', backup:'النسخ الاحتياطي' };
 
     function switchAdminTab(tab) {
       adminCurrentTab = tab;
@@ -2581,6 +2740,7 @@
         case 'stlfiles': renderAdminSTLFiles(); break;
         case 'promo': renderAdminPromo(); break;
         case 'backup': break;
+        case 'customers': renderAdminCustomers(); break;
       }
     }
 
@@ -2592,11 +2752,19 @@
       var pc = (data.products || []).length;
       var cc = (data.categories || []).length;
       var ct = (data.contacts || []).length;
+
+      // Compute total registered users and today's unique visitors (async, show 0 initially)
+      var totalUsers = window._cachedUserCount || 0;
+      var today = new Date().toISOString().split('T')[0];
+      var dailyUsers = (data.stats && data.stats.dailyUsers && data.stats.dailyUsers[today]) || 0;
+
       document.getElementById('adminStatsGrid').innerHTML =
         '<div class="stat-card"><div class="stat-glow" style="background:#e2b04a"></div><div class="stat-icon" style="background:rgba(226,176,74,0.1)"><svg width="22" height="22" fill="none" stroke="#e2b04a" stroke-width="2" viewBox="0 0 24 24"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg></div><div class="stat-value">'+vc.toLocaleString('ar-EG')+'</div><div class="stat-label">إجمالي الزيارات</div></div>' +
+        '<div class="stat-card"><div class="stat-glow" style="background:#f97316"></div><div class="stat-icon" style="background:rgba(249,115,22,0.1)"><svg width="22" height="22" fill="none" stroke="#f97316" stroke-width="2" viewBox="0 0 24 24"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg></div><div class="stat-value" id="dashUserCount">'+totalUsers+'</div><div class="stat-label">الحسابات المسجلة</div></div>' +
         '<div class="stat-card"><div class="stat-glow" style="background:#3b82f6"></div><div class="stat-icon" style="background:rgba(59,130,246,0.1)"><svg width="22" height="22" fill="none" stroke="#3b82f6" stroke-width="2" viewBox="0 0 24 24"><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"/></svg></div><div class="stat-value">'+pc+'</div><div class="stat-label">المنتجات</div></div>' +
         '<div class="stat-card"><div class="stat-glow" style="background:#10b981"></div><div class="stat-icon" style="background:rgba(16,185,129,0.1)"><svg width="22" height="22" fill="none" stroke="#10b981" stroke-width="2" viewBox="0 0 24 24"><path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"/></svg></div><div class="stat-value">'+cc+'</div><div class="stat-label">التصنيفات</div></div>' +
-        '<div class="stat-card"><div class="stat-glow" style="background:#a855f7"></div><div class="stat-icon" style="background:rgba(168,85,247,0.1)"><svg width="22" height="22" fill="none" stroke="#a855f7" stroke-width="2" viewBox="0 0 24 24"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg></div><div class="stat-value">'+ct+'</div><div class="stat-label">وسائل التواصل</div></div>';
+        '<div class="stat-card"><div class="stat-glow" style="background:#a855f7"></div><div class="stat-icon" style="background:rgba(168,85,247,0.1)"><svg width="22" height="22" fill="none" stroke="#a855f7" stroke-width="2" viewBox="0 0 24 24"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg></div><div class="stat-value">'+ct+'</div><div class="stat-label">وسائل التواصل</div></div>' +
+        '<div class="stat-card"><div class="stat-glow" style="background:#06b6d4"></div><div class="stat-icon" style="background:rgba(6,182,212,0.1)"><svg width="22" height="22" fill="none" stroke="#06b6d4" stroke-width="2" viewBox="0 0 24 24"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg></div><div class="stat-value">'+dailyUsers+'</div><div class="stat-label">زوار اليوم (فريدين)</div></div>';
 
       var dv = (data.stats && data.stats.dailyVisits) || {};
       var dn = ['الأحد','الإثنين','الثلاثاء','الأربعاء','الخميس','الجمعة','السبت'];
@@ -2648,6 +2816,7 @@
       document.getElementById('settingSiteName').value = s.siteName || '3DVISION store';
       document.getElementById('settingSiteNameEn').value = s.siteNameEn || 'متجر 3D ڤيچن';
       document.getElementById('settingDefaultTheme').value = s.defaultTheme || 'dark';
+      document.getElementById('settingSupportWaste').value = s.supportWastePercent != null ? s.supportWastePercent : 15;
       var preview = document.getElementById('logoPreviewArea');
       if (s.logo) { preview.innerHTML = '<img src="'+s.logo+'" alt="Logo">'; }
       else { preview.innerHTML = '<svg width="32" height="32" fill="none" stroke="#555" stroke-width="1.5" viewBox="0 0 24 24"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><path d="M21 15l-5-5L5 21"/></svg>'; }
@@ -2657,6 +2826,7 @@
       data.settings.siteName = document.getElementById('settingSiteName').value.trim() || '3DVISION store';
       data.settings.siteNameEn = document.getElementById('settingSiteNameEn').value.trim() || 'متجر 3D ڤيچن';
       data.settings.defaultTheme = document.getElementById('settingDefaultTheme').value;
+      data.settings.supportWastePercent = parseInt(document.getElementById('settingSupportWaste').value) || 15;
       saveData('settings');
       renderBranding();
     }
@@ -3648,12 +3818,15 @@
 
     function updateSTLPrice(solidWeight, mat) {
       var actualWeight = calcWeightWithInfill(solidWeight, stlState.selectedInfill);
-      var price = Math.round(actualWeight * mat.pricePerGram * 100) / 100;
+      var basePrice = Math.round(actualWeight * mat.pricePerGram * 100) / 100;
+      var supportPct = (data.settings && data.settings.supportWastePercent != null) ? data.settings.supportWastePercent : 15;
+      var supportAmount = Math.round(basePrice * supportPct / 100 * 100) / 100;
+      var totalPrice = Math.round((basePrice + supportAmount) * 100) / 100;
       document.getElementById('stlPriceBox').style.display = 'block';
-      document.getElementById('stlPriceDisplay').textContent = formatPrice(price);
+      document.getElementById('stlPriceDisplay').textContent = formatPrice(totalPrice);
       document.getElementById('stlPriceBreakdown').textContent = 'حشو ' + stlState.selectedInfill + '%';
       // Store the message for sending later
-      stlState.orderMessage = 'أريد طلب طباعة 3D مخصص\n📁 الملف: ' + stlState.fileName + '\n🧱 الخامة: ' + mat.name + '\n⚖️ الوزن التقريبي: ' + actualWeight.toFixed(1) + ' جرام\n💰 السعر التقريبي: ' + formatPrice(price) + '\n🔄 نسبة الحشو: ' + stlState.selectedInfill + '%';
+      stlState.orderMessage = 'أريد طلب طباعة 3D مخصص\n📁 الملف: ' + stlState.fileName + '\n🧱 الخامة: ' + mat.name + '\n⚖️ الوزن التقريبي: ' + actualWeight.toFixed(1) + ' جرام\n🔄 نسبة الحشو: ' + stlState.selectedInfill + '%\n💰 السعر التقريبي: ' + formatPrice(totalPrice);
       // Show order button
       var btnText = document.getElementById('stlOrderBtnText');
       btnText.textContent = 'اطلب عبر واتساب';
@@ -3680,6 +3853,12 @@
       var btnText = document.getElementById('stlOrderBtnText');
       var msg = stlState.orderMessage;
 
+      // If user is logged in, append user info to WhatsApp message
+      var uid = getUserId();
+      if (uid && currentUser) {
+        msg += '\n\n👤 الحساب: ' + currentUser.name + ' (' + currentUser.phone + ')';
+      }
+
       if (!stlState.file) {
         var waLink = getWhatsAppLink() + '&text=' + encodeURIComponent(msg);
         window.location.href = waLink;
@@ -3704,7 +3883,8 @@
             price: stlState.orderMessage.match(/💰[^\n]*/)?.[0] || '',
             storageUrl: downloadUrl,
             timestamp: Date.now(),
-            expiresAt: Date.now() + 24 * 60 * 60 * 1000
+            expiresAt: Date.now() + 24 * 60 * 60 * 1000,
+            userId: getUserId() || null
           });
         })
         .then(function(savedId) {
@@ -3932,6 +4112,363 @@
       document.querySelectorAll('#searchResults, #searchResultsMobile').forEach(function(c) { if(c) c.classList.remove('show'); });
     }
 
+    // ============ USER AUTHENTICATION ============
+    var currentUser = null;
+    var _cachedUserCount = 0;
+
+    function getUserId() {
+      return (currentUser && currentUser.id) ? currentUser.id : null;
+    }
+
+    function initUserSession() {
+      try {
+        var stored = localStorage.getItem('brq_user');
+        if (!stored) { updateUserUI(); return; }
+        var parsed = JSON.parse(stored);
+        if (!parsed || !parsed.id) { localStorage.removeItem('brq_user'); updateUserUI(); return; }
+        // Validate user still exists in Firebase
+        fetch(FIREBASE_DB_URL + '/users/' + parsed.id + '.json')
+          .then(function(r) { return r.json(); })
+          .then(function(userData) {
+            if (userData && userData.phone === parsed.phone) {
+              currentUser = { id: parsed.id, name: userData.name, phone: userData.phone, visitCount: userData.visitCount || 0 };
+              localStorage.setItem('brq_user', JSON.stringify(currentUser));
+            } else {
+              localStorage.removeItem('brq_user');
+              currentUser = null;
+            }
+            updateUserUI();
+          })
+          .catch(function() {
+            // If Firebase fails, still use cached data
+            currentUser = parsed;
+            updateUserUI();
+          });
+      } catch (e) {
+        currentUser = null;
+        updateUserUI();
+      }
+    }
+
+    function showAuthModal(tab) {
+      var overlay = document.getElementById('authModalOverlay');
+      overlay.classList.add('active');
+      switchAuthTab(tab || 'login');
+    }
+
+    function hideAuthModal() {
+      document.getElementById('authModalOverlay').classList.remove('active');
+    }
+
+    function switchAuthTab(tab) {
+      var loginTab = document.getElementById('authTabLogin');
+      var regTab = document.getElementById('authTabRegister');
+      var loginForm = document.getElementById('authLoginForm');
+      var regForm = document.getElementById('authRegisterForm');
+      if (tab === 'register') {
+        loginTab.classList.remove('active');
+        regTab.classList.add('active');
+        loginForm.style.display = 'none';
+        regForm.style.display = 'block';
+      } else {
+        loginTab.classList.add('active');
+        regTab.classList.remove('active');
+        loginForm.style.display = 'block';
+        regForm.style.display = 'none';
+      }
+      // Clear errors
+      document.getElementById('authLoginError').textContent = '';
+      document.getElementById('authRegError').textContent = '';
+    }
+
+    function userRegister() {
+      var name = document.getElementById('authRegName').value.trim();
+      var phone = document.getElementById('authRegPhone').value.trim();
+      var password = document.getElementById('authRegPassword').value;
+      var confirm = document.getElementById('authRegConfirm').value;
+      var errorEl = document.getElementById('authRegError');
+      var btn = document.getElementById('authRegBtn');
+
+      errorEl.textContent = '';
+      if (!name) { errorEl.textContent = 'أدخل الاسم'; return; }
+      if (!phone) { errorEl.textContent = 'أدخل رقم الهاتف'; return; }
+      if (phone.length < 8) { errorEl.textContent = 'رقم الهاتف قصير جداً'; return; }
+      if (!password || password.length < 4) { errorEl.textContent = 'كلمة المرور يجب أن تكون 4 أحرف على الأقل'; return; }
+      if (password !== confirm) { errorEl.textContent = 'كلمتا المرور غير متطابقتين'; return; }
+
+      btn.disabled = true;
+      btn.textContent = 'جاري إنشاء الحساب...';
+
+      // Check if phone already exists
+      fetch(FIREBASE_DB_URL + '/users.json')
+        .then(function(r) { return r.json(); })
+        .then(function(users) {
+          if (users) {
+            var keys = Object.keys(users);
+            for (var i = 0; i < keys.length; i++) {
+              if (users[keys[i]].phone === phone) {
+                errorEl.textContent = 'هذا الرقم مسجل بالفعل — سجل دخول';
+                btn.disabled = false;
+                btn.textContent = 'إنشاء حساب';
+                return;
+              }
+            }
+          }
+          // Create user
+          var newUserData = {
+            name: name,
+            phone: phone,
+            password: password,
+            createdAt: Date.now(),
+            visitCount: 0
+          };
+          return fetch(FIREBASE_DB_URL + '/users.json', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(newUserData)
+          });
+        })
+        .then(function(res) {
+          if (!res) return; // phone existed, handled above
+          return res.json();
+        })
+        .then(function(result) {
+          btn.disabled = false;
+          btn.textContent = 'إنشاء حساب';
+          if (!result || !result.name) {
+            errorEl.textContent = 'حدث خطأ — حاول مرة أخرى';
+            return;
+          }
+          // Auto-login
+          currentUser = { id: result.name, name: name, phone: phone, visitCount: 0 };
+          localStorage.setItem('brq_user', JSON.stringify(currentUser));
+          updateUserUI();
+          hideAuthModal();
+          showToast('تم إنشاء الحساب بنجاح ✓', 'success');
+          // Clear form
+          document.getElementById('authRegName').value = '';
+          document.getElementById('authRegPhone').value = '';
+          document.getElementById('authRegPassword').value = '';
+          document.getElementById('authRegConfirm').value = '';
+        })
+        .catch(function(err) {
+          console.error('[AUTH] Register error:', err);
+          errorEl.textContent = 'خطأ في الاتصال — حاول مرة أخرى';
+          btn.disabled = false;
+          btn.textContent = 'إنشاء حساب';
+        });
+    }
+
+    function userLogin() {
+      var phone = document.getElementById('authLoginPhone').value.trim();
+      var password = document.getElementById('authLoginPassword').value;
+      var errorEl = document.getElementById('authLoginError');
+      var btn = document.getElementById('authLoginBtn');
+
+      errorEl.textContent = '';
+      if (!phone) { errorEl.textContent = 'أدخل رقم الهاتف'; return; }
+      if (!password) { errorEl.textContent = 'أدخل كلمة المرور'; return; }
+
+      btn.disabled = true;
+      btn.textContent = 'جاري تسجيل الدخول...';
+
+      fetch(FIREBASE_DB_URL + '/users.json')
+        .then(function(r) { return r.json(); })
+        .then(function(users) {
+          if (!users) {
+            errorEl.textContent = 'رقم الهاتف أو كلمة المرور غير صحيحة';
+            btn.disabled = false; btn.textContent = 'تسجيل الدخول';
+            return;
+          }
+          var keys = Object.keys(users);
+          var foundId = null;
+          for (var i = 0; i < keys.length; i++) {
+            var u = users[keys[i]];
+            if (u.phone === phone && u.password === password) {
+              foundId = keys[i];
+              break;
+            }
+          }
+          if (!foundId) {
+            errorEl.textContent = 'رقم الهاتف أو كلمة المرور غير صحيحة';
+            btn.disabled = false; btn.textContent = 'تسجيل الدخول';
+            return;
+          }
+          currentUser = {
+            id: foundId,
+            name: users[foundId].name,
+            phone: users[foundId].phone,
+            visitCount: users[foundId].visitCount || 0
+          };
+          localStorage.setItem('brq_user', JSON.stringify(currentUser));
+          updateUserUI();
+          hideAuthModal();
+          showToast('مرحباً ' + currentUser.name + ' ✓', 'success');
+          btn.disabled = false; btn.textContent = 'تسجيل الدخول';
+        })
+        .catch(function(err) {
+          console.error('[AUTH] Login error:', err);
+          errorEl.textContent = 'خطأ في الاتصال — حاول مرة أخرى';
+          btn.disabled = false; btn.textContent = 'تسجيل الدخول';
+        });
+    }
+
+    function userLogout() {
+      currentUser = null;
+      localStorage.removeItem('brq_user');
+      updateUserUI();
+      closeDesktopUserDropdown();
+      showToast('تم تسجيل الخروج', 'success');
+    }
+
+    function updateUserUI() {
+      var iconBtn = document.getElementById('desktopUserIcon');
+      var avatarBtn = document.getElementById('desktopUserAvatar');
+      var dropdown = document.getElementById('desktopUserDropdown');
+      var nameEl = document.getElementById('desktopUserName');
+      var mobileBtnText = document.getElementById('mobileUserBtnText');
+
+      if (currentUser) {
+        iconBtn.style.display = 'none';
+        avatarBtn.style.display = 'flex';
+        avatarBtn.textContent = currentUser.name ? currentUser.name.charAt(0) : '?';
+        nameEl.textContent = currentUser.name || '';
+        if (mobileBtnText) {
+          mobileBtnText.textContent = currentUser.name + ' — تسجيل الخروج';
+        }
+      } else {
+        iconBtn.style.display = 'flex';
+        avatarBtn.style.display = 'none';
+        if (mobileBtnText) {
+          mobileBtnText.textContent = 'تسجيل الدخول';
+        }
+      }
+    }
+
+    function handleDesktopUserClick() {
+      if (currentUser) {
+        var dropdown = document.getElementById('desktopUserDropdown');
+        dropdown.classList.toggle('show');
+      } else {
+        showAuthModal('login');
+      }
+    }
+
+    function closeDesktopUserDropdown() {
+      var dropdown = document.getElementById('desktopUserDropdown');
+      if (dropdown) dropdown.classList.remove('show');
+    }
+
+    function handleMobileUserClick() {
+      if (currentUser) {
+        userLogout();
+      } else {
+        showAuthModal('login');
+        closeMenu();
+      }
+    }
+
+    // Close user dropdown on outside click
+    document.addEventListener('click', function(e) {
+      var area = document.getElementById('desktopUserArea');
+      if (area && !area.contains(e.target)) {
+        closeDesktopUserDropdown();
+      }
+    });
+
+    // Enter key on auth forms
+    document.addEventListener('keydown', function(e) {
+      if (e.key !== 'Enter') return;
+      var el = document.activeElement;
+      if (!el) return;
+      if (el.id === 'authLoginPhone' || el.id === 'authLoginPassword') userLogin();
+      if (el.id === 'authRegName' || el.id === 'authRegPhone' || el.id === 'authRegPassword' || el.id === 'authRegConfirm') userRegister();
+    });
+
+    // ============ ADMIN CUSTOMERS TAB ============
+    async function renderAdminCustomers() {
+      var container = document.getElementById('adminCustomersList');
+      if (!container) return;
+      container.innerHTML = '<div style="text-align:center;padding:2rem;color:#888"><div style="width:24px;height:24px;border:3px solid rgba(226,176,74,0.2);border-top-color:#e2b04a;border-radius:50%;animation:spin 1s linear infinite;margin:0 auto 0.5rem"></div>جاري تحميل العملاء...</div>';
+
+      try {
+        var [usersRes, stlRes] = await Promise.all([
+          fetch(FIREBASE_DB_URL + '/users.json'),
+          fetch(FIREBASE_DB_URL + '/stl_orders.json')
+        ]);
+        var users = await usersRes.json();
+        var stlOrders = await stlRes.json();
+
+        if (!users || Object.keys(users).length === 0) {
+          container.innerHTML = '<div style="text-align:center;padding:3rem;color:#666"><svg width="48" height="48" fill="none" stroke="#555" stroke-width="1.5" viewBox="0 0 24 24" style="margin:0 auto 1rem"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/></svg><p>لا يوجد عملاء مسجلين بعد</p></div>';
+          _cachedUserCount = 0;
+          return;
+        }
+
+        // Count STL files per user
+        var stlCounts = {};
+        if (stlOrders) {
+          Object.keys(stlOrders).forEach(function(key) {
+            var order = stlOrders[key];
+            if (order.userId) {
+              stlCounts[order.userId] = (stlCounts[order.userId] || 0) + 1;
+            }
+          });
+        }
+
+        // Cache user count for dashboard
+        _cachedUserCount = Object.keys(users).length;
+        var dashEl = document.getElementById('dashUserCount');
+        if (dashEl) dashEl.textContent = _cachedUserCount;
+
+        // Build list
+        var list = Object.keys(users).map(function(id) {
+          return { id: id, ...users[id] };
+        });
+        list.sort(function(a, b) { return (b.createdAt || 0) - (a.createdAt || 0); });
+
+        var html = '';
+        list.forEach(function(user) {
+          var joinDate = user.createdAt ? new Date(user.createdAt).toLocaleDateString('ar-EG', { day:'numeric', month:'short', year:'numeric' }) : '—';
+          var stlCount = stlCounts[user.id] || 0;
+          var visitCount = user.visitCount || 0;
+          var initials = user.name ? user.name.charAt(0) : '?';
+
+          html += '<div style="background:rgba(255,255,255,0.03);border:1px solid rgba(255,255,255,0.08);border-radius:12px;padding:1rem;margin-bottom:0.75rem">'
+            + '<div style="display:flex;align-items:center;gap:0.75rem">'
+            + '<div style="width:42px;height:42px;border-radius:50%;border:2px solid #e2b04a;background:rgba(226,176,74,0.15);color:#e2b04a;font-weight:700;font-size:1rem;display:flex;align-items:center;justify-content:center;flex-shrink:0">' + escapeHtml(initials) + '</div>'
+            + '<div style="flex:1;min-width:0">'
+            + '<div style="font-weight:600;font-size:0.9rem">' + escapeHtml(user.name) + '</div>'
+            + '<div style="font-size:0.78rem;color:#888">' + escapeHtml(user.phone) + ' • ' + joinDate + '</div>'
+            + '</div>'
+            + '<button class="admin-btn admin-btn-danger" style="font-size:0.75rem;padding:0.35rem 0.7rem;display:flex;align-items:center;gap:0.3rem" onclick="deleteCustomer(\'' + user.id + '\')"><svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/></svg>حذف</button>'
+            + '</div>'
+            + '<div style="display:flex;gap:1.5rem;flex-wrap:wrap;margin-top:0.75rem;padding-top:0.75rem;border-top:1px solid rgba(255,255,255,0.05);font-size:0.8rem;color:#aaa">'
+            + '<span>📅 الانضمام: ' + joinDate + '</span>'
+            + '<span>👁️ الزيارات: <strong style="color:#e2b04a">' + visitCount + '</strong></span>'
+            + '<span>📁 ملفات STL: <strong style="color:#e2b04a">' + stlCount + '</strong></span>'
+            + '</div></div>';
+        });
+
+        container.innerHTML = html;
+      } catch(e) {
+        console.error('Error loading customers:', e);
+        container.innerHTML = '<div style="text-align:center;padding:2rem;color:#ef4444">خطأ في تحميل العملاء</div>';
+      }
+    }
+
+    async function deleteCustomer(id) {
+      if (!confirm('حذف هذا العميل؟')) return;
+      try {
+        await fetch(FIREBASE_DB_URL + '/users/' + id + '.json', { method: 'DELETE' });
+        renderAdminCustomers();
+        showToast('تم حذف العميل', 'success');
+      } catch(e) {
+        console.error('Error deleting customer:', e);
+        showToast('خطأ في حذف العميل', 'error');
+      }
+    }
+
     // ============ INIT ============
     window.addEventListener('scroll', handleNavScroll);
     window.addEventListener('keydown', (e) => {
@@ -3941,6 +4478,10 @@
     document.addEventListener('DOMContentLoaded', async () => {
       // Load data (async - tries Firebase first)
       await loadData();
+
+      // Init user session
+      initUserSession();
+      updateUserUI();
 
       // Track visitor (only on main site)
       if (window.location.hash !== '#admin') trackVisitor();
