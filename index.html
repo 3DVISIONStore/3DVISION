@@ -283,7 +283,128 @@
       border-color: #e2b04a !important;
       background: rgba(226,176,74,0.08) !important;
     }
+
+    /* STL Viewer Modal */
+    .stl-viewer-overlay {
+      display: none;
+      position: fixed;
+      inset: 0;
+      background: rgba(0,0,0,0.85);
+      z-index: 200;
+      align-items: center;
+      justify-content: center;
+      padding: 1rem;
+      backdrop-filter: blur(6px);
+      -webkit-backdrop-filter: blur(6px);
+    }
+    .stl-viewer-overlay.active { display: flex; }
+    .stl-viewer-box {
+      background: #111;
+      border: 1px solid rgba(226,176,74,0.2);
+      border-radius: 16px;
+      width: 100%;
+      max-width: 900px;
+      height: 80vh;
+      max-height: 700px;
+      display: flex;
+      flex-direction: column;
+      overflow: hidden;
+    }
+    .stl-viewer-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0.75rem 1.25rem;
+      border-bottom: 1px solid rgba(255,255,255,0.08);
+      background: rgba(226,176,74,0.03);
+    }
+    .stl-viewer-header h3 {
+      font-size: 0.95rem;
+      font-weight: 600;
+      color: #e2b04a;
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+    .stl-viewer-close {
+      width: 36px;
+      height: 36px;
+      border-radius: 10px;
+      border: 1px solid rgba(255,255,255,0.1);
+      background: transparent;
+      color: #aaa;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: all 0.2s;
+    }
+    .stl-viewer-close:hover {
+      background: rgba(239,68,68,0.15);
+      border-color: rgba(239,68,68,0.3);
+      color: #ef4444;
+    }
+    .stl-viewer-canvas-wrap {
+      flex: 1;
+      position: relative;
+      overflow: hidden;
+    }
+    .stl-viewer-canvas-wrap canvas {
+      width: 100% !important;
+      height: 100% !important;
+      display: block;
+    }
+    .stl-viewer-loading {
+      position: absolute;
+      inset: 0;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-direction: column;
+      gap: 0.75rem;
+      color: #888;
+      font-size: 0.9rem;
+      background: #111;
+      z-index: 2;
+    }
+    .stl-viewer-loading .spinner {
+      width: 40px;
+      height: 40px;
+      border: 3px solid rgba(226,176,74,0.2);
+      border-top-color: #e2b04a;
+      border-radius: 50%;
+      animation: spin 1s linear infinite;
+    }
+    .stl-viewer-info {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 1.5rem;
+      padding: 0.6rem 1.25rem;
+      border-top: 1px solid rgba(255,255,255,0.08);
+      background: rgba(0,0,0,0.3);
+      font-size: 0.78rem;
+      color: #888;
+    }
+    .stl-viewer-info span {
+      display: flex;
+      align-items: center;
+      gap: 0.3rem;
+    }
+    .stl-viewer-info .val {
+      color: #e2b04a;
+      font-weight: 600;
+    }
   </style>
+  <!-- Three.js STL Viewer -->
+  <script type="importmap">
+  {
+    "imports": {
+      "three": "https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.module.js",
+      "three/addons/": "https://cdn.jsdelivr.net/npm/three@0.160.0/examples/jsm/"
+    }
+  }
+  </script>
 </head>
 <body class="min-h-screen flex flex-col bg-dark">
   <!-- ========== MAIN SITE ========== -->
@@ -468,6 +589,15 @@
             </div>
             <!-- Weight Result (hidden from UI, used internally) -->
             <div id="stlWeightResult" style="display:none"></div>
+          </div>
+          <!-- Inline 3D Viewer -->
+          <div id="stlInlineViewer" style="display:none;margin-top:1rem;border-radius:16px;overflow:hidden;border:1px solid rgba(226,176,74,0.15);background:#111;position:relative">
+            <div id="stlInlineCanvas" style="width:100%;height:350px;cursor:grab"></div>
+            <div id="stlInlineInfo" style="display:flex;align-items:center;justify-content:center;gap:1.25rem;padding:0.5rem 1rem;border-top:1px solid rgba(255,255,255,0.06);background:rgba(0,0,0,0.3);font-size:0.75rem;color:#888">
+              <span>📐 الأبعاد: <span class="val" id="stlInlineDims" style="color:#e2b04a;font-weight:600">—</span></span>
+              <span>📊 مثلثات: <span class="val" id="stlInlineTris" style="color:#e2b04a;font-weight:600">—</span></span>
+              <span style="color:#666">🖱️ اسحب للتدوير • عجلة الماوس للتكبير</span>
+            </div>
           </div>
           <!-- Material + Infill -->
           <div id="stlOptions" style="display:none" class="mt-6">
@@ -1091,6 +1221,25 @@
       </div>
     </div>
   </div>
+
+  <!-- STL 3D Viewer Modal -->
+  <div class="stl-viewer-overlay" id="stlViewerOverlay" onclick="if(event.target===this)closeSTLViewer()">
+    <div class="stl-viewer-box">
+      <div class="stl-viewer-header">
+        <h3><svg width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M12 2L2 7l10 5 10-5-10-5z"/><path d="M2 17l10 5 10-5"/><path d="M2 12l10 5 10-5"/></svg> <span id="stlViewerTitle">معاينة ملف STL</span></h3>
+        <button class="stl-viewer-close" onclick="closeSTLViewer()"><svg width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg></button>
+      </div>
+      <div class="stl-viewer-canvas-wrap" id="stlViewerCanvasWrap">
+        <div class="stl-viewer-loading" id="stlViewerLoading"><div class="spinner"></div><span>جاري تحميل النموذج...</span></div>
+      </div>
+      <div class="stl-viewer-info" id="stlViewerInfo">
+        <span>📐 الأبعاد: <span class="val" id="stlInfoDims">—</span></span>
+        <span>📊 مثلثات: <span class="val" id="stlInfoTris">—</span></span>
+        <span>🖱️ اسحب للتدوير • عجلة الماوس للتكبير</span>
+      </div>
+    </div>
+  </div>
+
   <div class="admin-modal-overlay" id="contactModalOverlay"><div class="admin-modal"><h3 id="contactModalTitle">إضافة وسيلة تواصل</h3><input type="hidden" id="contactEditId"><div class="admin-form-group"><label>المنصة</label><input type="text" id="contactPlatform" placeholder="واتساب، إنستغرام..."></div><div class="admin-form-group"><label>المعرف / الرقم</label><input type="text" id="contactHandle" placeholder="+201XXXXXXXXX"></div><div class="admin-form-group"><label>الرابط</label><input type="text" id="contactLink" placeholder="https://..."></div><div class="admin-form-group"><label>النوع</label><select id="contactType"><option value="whatsapp">واتساب</option><option value="instagram">إنستغرام</option><option value="tiktok">تيك توك</option><option value="phone">هاتف</option><option value="facebook">فيسبوك</option><option value="email">بريد إلكتروني</option><option value="linkedin">لينكد إن</option></select></div><div class="admin-form-group"><label>اللون</label><input type="color" id="contactColor" value="#e2b04a" style="height:40px;padding:4px;cursor:pointer"></div><div class="modal-actions"><button class="admin-btn admin-btn-primary" onclick="saveContact()">حفظ</button><button class="admin-btn admin-btn-secondary" onclick="hideContactForm()">إلغاء</button></div></div></div>
   <div class="admin-modal-overlay" id="productModalOverlay"><div class="admin-modal"><h3 id="productModalTitle">إضافة منتج</h3><input type="hidden" id="productEditId"><div class="admin-form-group"><label>اسم المنتج</label><input type="text" id="productName" placeholder="اسم المنتج"></div><div class="admin-form-group"><label>السعر</label><input type="number" id="productPrice" placeholder="0" step="1" min="0"></div><div class="admin-form-group"><label>السعر الأصلي (اختياري)</label><input type="number" id="productOriginalPrice" placeholder="0" step="1" min="0"></div><div class="admin-form-group"><label>صورة المنتج</label><div style="display:flex;gap:0.5rem;flex-wrap:wrap;align-items:end"><div style="flex:1;min-width:200px"><input type="text" id="productImage" placeholder="رابط الصورة https://..." style="margin-bottom:0.35rem"><input type="file" id="productImageFile" accept="image/*" onchange="handleProductImageUpload(event)" style="font-size:0.85rem"></div><div id="productImagePreview" style="width:60px;height:60px;border-radius:8px;border:1px solid rgba(255,255,255,0.1);background:#1a1a1a;display:flex;align-items:center;justify-content:center;overflow:hidden;flex-shrink:0"><svg width="24" height="24" fill="none" stroke="#555" stroke-width="1.5" viewBox="0 0 24 24"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><path d="M21 15l-5-5L5 21"/></svg></div></div></div><div class="admin-form-group"><label>التصنيف</label><select id="productCategory"></select></div><div class="admin-form-group" style="display:flex;align-items:center;gap:0.75rem"><label style="margin:0;cursor:pointer" for="productUseWeight">تسعير بالوزن (جرام × سعر الخامة)</label><label class="toggle-switch"><input type="checkbox" id="productUseWeight" onchange="toggleWeightFields()"><span class="toggle-slider"></span></label></div><div id="weightFieldsGroup" style="display:none"><div class="admin-form-group"><label>الوزن (جرام)</label><input type="number" id="productWeight" placeholder="مثال: 50" step="0.1" min="0"></div></div><div class="modal-actions"><button class="admin-btn admin-btn-primary" onclick="saveProduct()">حفظ</button><button class="admin-btn admin-btn-secondary" onclick="hideProductForm()">إلغاء</button></div></div></div>
   <div class="admin-modal-overlay" id="categoryModalOverlay"><div class="admin-modal"><h3 id="categoryModalTitle">إضافة تصنيف</h3><input type="hidden" id="categoryEditId"><div class="admin-form-group"><label>اسم التصنيف (عربي)</label><input type="text" id="categoryTitleAr" placeholder="مثال: إطارات السيارات"></div><div class="admin-form-group"><label>اسم التصنيف (إنجليزي)</label><input type="text" id="categoryTitleEn" placeholder="FRAMES"></div><div class="admin-form-group"><label>وصف التصنيف</label><input type="text" id="categoryDescAr" placeholder="وصف مختصر بالعربي..."></div><div class="admin-form-group"><label>رابط صورة التصنيف</label><div style="display:flex;gap:0.5rem;flex-wrap:wrap;align-items:end"><div style="flex:1;min-width:200px"><input type="text" id="categoryImage" placeholder="https://..." style="margin-bottom:0.35rem"><input type="file" id="categoryImageFile" accept="image/*" onchange="handleCategoryImageUpload(event)" style="font-size:0.85rem"></div><div id="categoryImagePreview" style="width:60px;height:60px;border-radius:8px;border:1px solid rgba(255,255,255,0.1);background:#1a1a1a;display:flex;align-items:center;justify-content:center;overflow:hidden;flex-shrink:0"><svg width="24" height="24" fill="none" stroke="#555" stroke-width="1.5" viewBox="0 0 24 24"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><path d="M21 15l-5-5L5 21"/></svg></div></div></div><div class="modal-actions"><button class="admin-btn admin-btn-primary" onclick="saveCategory()">حفظ</button><button class="admin-btn admin-btn-secondary" onclick="hideCategoryForm()">إلغاء</button></div></div></div>
@@ -3417,6 +3566,11 @@
       document.getElementById('stlFileName').textContent = file.name;
       document.getElementById('stlFileSize').textContent = file.size > 1024*1024 ? sizeMB + ' MB' : sizeKB + ' KB';
       document.getElementById('stlFileInfo').style.display = 'block';
+      // Show inline 3D viewer
+      if (window.renderSTLInline) {
+        var blobUrl = URL.createObjectURL(file);
+        window.renderSTLInline(blobUrl);
+      }
       // Build material options
       var materials = data.materialPricing || [];
       if (!materials.length) {
@@ -3508,6 +3662,8 @@
 
     function resetSTL() {
       stlState = { volume: 0, solidWeight: 0, fileName: '', selectedMaterial: null, selectedInfill: 20, file: null, orderMessage: '' };
+      // Clean up inline 3D viewer
+      if (window.disposeSTLInline) window.disposeSTLInline();
       document.getElementById('stlUploadIcon').innerHTML = '<svg width="28" height="28" fill="none" stroke="#e2b04a" stroke-width="1.5" viewBox="0 0 24 24"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>';
       document.getElementById('stlUploadText').textContent = 'اسحب ملف STL هنا أو اضغط للرفع';
       document.getElementById('stlDropZone').style.pointerEvents = '';
@@ -3634,6 +3790,7 @@
               + (order.price ? '<span>' + escapeHtml(order.price) + '</span>' : '')
               + '</div>' : '')
             + '<div style="display:flex;gap:0.5rem;margin-top:0.75rem">'
+            + (order.storageUrl && !isExpired ? '<button class="admin-btn" style="font-size:0.8rem;padding:0.4rem 0.8rem;display:flex;align-items:center;gap:0.4rem;border:1px solid rgba(226,176,74,0.4);color:#e2b04a" onclick="openSTLViewer(\'' + order.storageUrl + '\', \'' + escapeHtml(order.fileName || order.originalName || 'ملف STL') + '\')"><svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>معاينة</button>' : '')
             + (order.storageUrl && !isExpired ? '<a href="' + order.storageUrl + '" download="' + escapeHtml(order.originalName || order.fileName || 'file.stl') + '" class="admin-btn admin-btn-primary" style="font-size:0.8rem;padding:0.4rem 0.8rem;display:flex;align-items:center;gap:0.4rem;text-decoration:none"><svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>تحميل الملف</a>' : '')
             + '<button class="admin-btn admin-btn-danger" style="font-size:0.8rem;padding:0.4rem 0.8rem;display:flex;align-items:center;gap:0.4rem" onclick="deleteSTLFile(\'' + order.id + '\')"><svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/></svg>حذف</button>'
             + '</div></div>';
@@ -3830,6 +3987,313 @@
         e.target.style.padding = '0';
       }
     }, true);
+  </script>
+
+  <!-- STL 3D Viewer (Three.js Module) -->
+  <script type="module">
+    import * as THREE from 'three';
+    import { STLLoader } from 'three/addons/loaders/STLLoader.js';
+    import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
+
+    var _scene, _camera, _renderer, _controls, _animId;
+
+    function _initViewer(container) {
+      // Clean up previous
+      _dispose();
+
+      var w = container.clientWidth;
+      var h = container.clientHeight;
+
+      _scene = new THREE.Scene();
+      _scene.background = new THREE.Color(0x111111);
+
+      _camera = new THREE.PerspectiveCamera(45, w / h, 0.1, 10000);
+      _camera.position.set(80, 60, 80);
+
+      _renderer = new THREE.WebGLRenderer({ antialias: true });
+      _renderer.setSize(w, h);
+      _renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+      _renderer.shadowMap.enabled = true;
+      container.appendChild(_renderer.domElement);
+
+      _controls = new OrbitControls(_camera, _renderer.domElement);
+      _controls.enableDamping = true;
+      _controls.dampingFactor = 0.08;
+      _controls.rotateSpeed = 0.8;
+      _controls.zoomSpeed = 1.2;
+
+      // Lights
+      var ambient = new THREE.AmbientLight(0xffffff, 0.5);
+      _scene.add(ambient);
+      var dir1 = new THREE.DirectionalLight(0xffffff, 0.9);
+      dir1.position.set(100, 150, 100);
+      _scene.add(dir1);
+      var dir2 = new THREE.DirectionalLight(0xe2b04a, 0.3);
+      dir2.position.set(-80, -40, -60);
+      _scene.add(dir2);
+
+      // Grid
+      var grid = new THREE.GridHelper(200, 20, 0x333333, 0x1a1a1a);
+      _scene.add(grid);
+
+      // Resize handler
+      var ro = new ResizeObserver(function() {
+        var nw = container.clientWidth;
+        var nh = container.clientHeight;
+        if (nw === 0 || nh === 0) return;
+        _camera.aspect = nw / nh;
+        _camera.updateProjectionMatrix();
+        _renderer.setSize(nw, nh);
+      });
+      ro.observe(container);
+      container._ro = ro;
+
+      function animate() {
+        _animId = requestAnimationFrame(animate);
+        _controls.update();
+        _renderer.render(_scene, _camera);
+      }
+      animate();
+    }
+
+    function _dispose() {
+      if (_animId) cancelAnimationFrame(_animId);
+      _animId = null;
+      if (_controls) { _controls.dispose(); _controls = null; }
+      if (_renderer) { _renderer.dispose(); _renderer.domElement.remove(); _renderer = null; }
+      if (_scene) {
+        _scene.traverse(function(obj) {
+          if (obj.geometry) obj.geometry.dispose();
+          if (obj.material) {
+            if (Array.isArray(obj.material)) obj.material.forEach(function(m){ m.dispose(); });
+            else obj.material.dispose();
+          }
+        });
+        _scene = null;
+      }
+      _camera = null;
+    }
+
+    window.openSTLViewer = function(url, title) {
+      var overlay = document.getElementById('stlViewerOverlay');
+      var wrap = document.getElementById('stlViewerCanvasWrap');
+      var loading = document.getElementById('stlViewerLoading');
+      var titleEl = document.getElementById('stlViewerTitle');
+      var dimsEl = document.getElementById('stlInfoDims');
+      var trisEl = document.getElementById('stlInfoTris');
+
+      titleEl.textContent = title || 'معاينة ملف STL';
+      dimsEl.textContent = '—';
+      trisEl.textContent = '—';
+      loading.style.display = 'flex';
+      overlay.classList.add('active');
+
+      _initViewer(wrap);
+
+      var loader = new STLLoader();
+      loader.load(url, function(geometry) {
+        loading.style.display = 'none';
+
+        geometry.computeVertexNormals();
+
+        var material = new THREE.MeshStandardMaterial({
+          color: 0xe2b04a,
+          metalness: 0.4,
+          roughness: 0.5,
+          flatShading: false
+        });
+        var mesh = new THREE.Mesh(geometry, material);
+        mesh.castShadow = true;
+
+        geometry.computeBoundingBox();
+        var size = new THREE.Vector3();
+        geometry.boundingBox.getSize(size);
+        var maxDim = Math.max(size.x, size.y, size.z);
+        var scale = 100 / maxDim;
+
+        geometry.center();
+        mesh.scale.set(scale, scale, scale);
+        _scene.add(mesh);
+
+        // Camera: look at origin where model is centered
+        var dist = maxDim * 1.8;
+        _camera.position.set(dist * 0.6, dist * 0.5, dist * 0.7);
+        _controls.target.set(0, 0, 0);
+        _controls.update();
+
+        // Info
+        dimsEl.textContent = size.x.toFixed(1) + ' × ' + size.y.toFixed(1) + ' × ' + size.z.toFixed(1) + ' مم';
+        var triCount = geometry.index ? geometry.index.count / 3 : geometry.attributes.position.count / 3;
+        trisEl.textContent = Math.round(triCount).toLocaleString();
+
+      }, undefined, function(err) {
+        loading.innerHTML = '<span style="color:#ef4444">فشل تحميل النموذج — تأكد أن الملف صالح</span>';
+        console.error('[STL Viewer] Load error:', err);
+      });
+    };
+
+    window.closeSTLViewer = function() {
+      var overlay = document.getElementById('stlViewerOverlay');
+      var wrap = document.getElementById('stlViewerCanvasWrap');
+      var loading = document.getElementById('stlViewerLoading');
+
+      overlay.classList.remove('active');
+      if (wrap._ro) { wrap._ro.disconnect(); wrap._ro = null; }
+      _dispose();
+
+      // Reset loading state
+      loading.style.display = 'flex';
+      loading.innerHTML = '<div class="spinner"></div><span>جاري تحميل النموذج...</span>';
+    };
+
+    // ============ INLINE STL VIEWER (Customer Pricing) ============
+    var _inl_scene, _inl_camera, _inl_renderer, _inl_controls, _inl_animId, _inl_ro;
+
+    function _inl_dispose() {
+      if (_inl_animId) cancelAnimationFrame(_inl_animId);
+      _inl_animId = null;
+      if (_inl_controls) { _inl_controls.dispose(); _inl_controls = null; }
+      if (_inl_renderer) { _inl_renderer.dispose(); _inl_renderer.domElement.remove(); _inl_renderer = null; }
+      if (_inl_scene) {
+        _inl_scene.traverse(function(obj) {
+          if (obj.geometry) obj.geometry.dispose();
+          if (obj.material) {
+            if (Array.isArray(obj.material)) obj.material.forEach(function(m){ m.dispose(); });
+            else obj.material.dispose();
+          }
+        });
+        _inl_scene = null;
+      }
+      _inl_camera = null;
+      if (_inl_ro) { _inl_ro.disconnect(); _inl_ro = null; }
+    }
+
+    window.renderSTLInline = function(blobUrl) {
+      var wrap = document.getElementById('stlInlineCanvas');
+      var viewerBox = document.getElementById('stlInlineViewer');
+      var dimsEl = document.getElementById('stlInlineDims');
+      var trisEl = document.getElementById('stlInlineTris');
+      if (!wrap) return;
+
+      // Clean previous
+      _inl_dispose();
+      dimsEl.textContent = '—';
+      trisEl.textContent = '—';
+
+      // Remove old canvases inside wrap
+      wrap.querySelectorAll('canvas').forEach(function(c){ c.remove(); });
+
+      viewerBox.style.display = 'block';
+      var w = wrap.clientWidth || 600;
+      var h = wrap.clientHeight || 350;
+
+      _inl_scene = new THREE.Scene();
+      _inl_scene.background = new THREE.Color(0x111111);
+
+      _inl_camera = new THREE.PerspectiveCamera(45, w / h, 0.1, 10000);
+
+      _inl_renderer = new THREE.WebGLRenderer({ antialias: true });
+      _inl_renderer.setSize(w, h);
+      _inl_renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+      wrap.appendChild(_inl_renderer.domElement);
+
+      _inl_controls = new OrbitControls(_inl_camera, _inl_renderer.domElement);
+      _inl_controls.enableDamping = true;
+      _inl_controls.dampingFactor = 0.08;
+      _inl_controls.rotateSpeed = 0.8;
+      _inl_controls.zoomSpeed = 1.2;
+
+      // Lights
+      _inl_scene.add(new THREE.AmbientLight(0xffffff, 0.5));
+      var d1 = new THREE.DirectionalLight(0xffffff, 0.9);
+      d1.position.set(100, 150, 100);
+      _inl_scene.add(d1);
+      var d2 = new THREE.DirectionalLight(0xe2b04a, 0.3);
+      d2.position.set(-80, -40, -60);
+      _inl_scene.add(d2);
+
+      // Grid
+      _inl_scene.add(new THREE.GridHelper(200, 20, 0x333333, 0x1a1a1a));
+
+      // Resize
+      _inl_ro = new ResizeObserver(function() {
+        var nw = wrap.clientWidth;
+        var nh = wrap.clientHeight;
+        if (!nw || !nh || !_inl_camera || !_inl_renderer) return;
+        _inl_camera.aspect = nw / nh;
+        _inl_camera.updateProjectionMatrix();
+        _inl_renderer.setSize(nw, nh);
+      });
+      _inl_ro.observe(wrap);
+
+      // Animation loop
+      (function animate() {
+        _inl_animId = requestAnimationFrame(animate);
+        if (_inl_controls) _inl_controls.update();
+        if (_inl_renderer && _inl_scene && _inl_camera) _inl_renderer.render(_inl_scene, _inl_camera);
+      })();
+
+      // Load STL
+      var loader = new STLLoader();
+      loader.load(blobUrl, function(geometry) {
+        geometry.computeVertexNormals();
+
+        var material = new THREE.MeshStandardMaterial({
+          color: 0xe2b04a,
+          metalness: 0.4,
+          roughness: 0.5,
+          flatShading: false
+        });
+        var mesh = new THREE.Mesh(geometry, material);
+        mesh.castShadow = true;
+
+        geometry.computeBoundingBox();
+        var size = new THREE.Vector3();
+        geometry.boundingBox.getSize(size);
+        var maxDim = Math.max(size.x, size.y, size.z);
+        var scale = 100 / maxDim;
+
+        geometry.center();
+        mesh.scale.set(scale, scale, scale);
+        _inl_scene.add(mesh);
+
+        // Camera: look at origin where model is centered
+        var dist = maxDim * 1.8;
+        _inl_camera.position.set(dist * 0.6, dist * 0.5, dist * 0.7);
+        _inl_controls.target.set(0, 0, 0);
+        _inl_controls.update();
+
+        // Info
+        dimsEl.textContent = size.x.toFixed(1) + ' × ' + size.y.toFixed(1) + ' × ' + size.z.toFixed(1) + ' مم';
+        var triCount = geometry.index ? geometry.index.count / 3 : geometry.attributes.position.count / 3;
+        trisEl.textContent = Math.round(triCount).toLocaleString();
+
+        // Free blob URL after load
+        URL.revokeObjectURL(blobUrl);
+
+      }, undefined, function(err) {
+        console.error('[STL Inline] Load error:', err);
+        viewerBox.style.display = 'none';
+      });
+    };
+
+    window.disposeSTLInline = function() {
+      var viewerBox = document.getElementById('stlInlineViewer');
+      if (viewerBox) viewerBox.style.display = 'none';
+      var wrap = document.getElementById('stlInlineCanvas');
+      if (wrap) wrap.querySelectorAll('canvas').forEach(function(c){ c.remove(); });
+      _inl_dispose();
+    };
+
+    // Close on Escape
+    document.addEventListener('keydown', function(e) {
+      if (e.key === 'Escape') {
+        var overlay = document.getElementById('stlViewerOverlay');
+        if (overlay && overlay.classList.contains('active')) {
+          closeSTLViewer();
+        }
+      }
+    });
   </script>
 </body>
 </html>
