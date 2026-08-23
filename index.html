@@ -468,6 +468,177 @@
     [data-theme="light"] .user-dropdown { background: #fff; border-color: #ddd; box-shadow: 0 8px 32px rgba(0,0,0,0.12); }
     [data-theme="light"] .user-dropdown-item { color: #555; }
     [data-theme="light"] .user-dropdown-item:hover { background: #f0f0f0; color: #222; }
+    /* === Cart Styles === */
+    .cart-icon-btn { position: relative; }
+    .cart-badge {
+      position: absolute; top: -4px; left: -4px; min-width: 18px; height: 18px;
+      background: #ef4444; color: #fff; font-size: 0.65rem; font-weight: 700;
+      border-radius: 50%; display: flex; align-items: center; justify-content: center;
+      padding: 0 4px; line-height: 1; pointer-events: none;
+      animation: cartBadgePop 0.3s ease;
+    }
+    .cart-badge:empty { display: none; }
+    @keyframes cartBadgePop {
+      0% { transform: scale(0); } 60% { transform: scale(1.2); } 100% { transform: scale(1); }
+    }
+    .cart-modal-overlay {
+      position: fixed; inset: 0; background: rgba(0,0,0,0.7); z-index: 160;
+      display: flex; align-items: stretch; justify-content: flex-end;
+      opacity: 0; pointer-events: none; transition: opacity 0.3s;
+      backdrop-filter: blur(4px);
+    }
+    .cart-modal-overlay.active { opacity: 1; pointer-events: all; }
+    .cart-panel {
+      background: #141414; border-right: 1px solid rgba(226,176,74,0.15);
+      width: 100%; max-width: 420px; display: flex; flex-direction: column;
+      transform: translateX(100%); transition: transform 0.35s cubic-bezier(0.16,1,0.3,1);
+    }
+    .cart-modal-overlay.active .cart-panel { transform: translateX(0); }
+    .cart-panel-header {
+      display: flex; align-items: center; justify-content: space-between;
+      padding: 1.25rem 1.5rem; border-bottom: 1px solid rgba(255,255,255,0.08);
+      background: rgba(226,176,74,0.03);
+    }
+    .cart-panel-header h3 {
+      font-size: 1.1rem; font-weight: 700; color: #e2b04a;
+      display: flex; align-items: center; gap: 0.5rem;
+    }
+    .cart-panel-close {
+      width: 36px; height: 36px; border-radius: 10px;
+      border: 1px solid rgba(255,255,255,0.1); background: transparent;
+      color: #aaa; cursor: pointer; display: flex; align-items: center;
+      justify-content: center; transition: all 0.2s;
+    }
+    .cart-panel-close:hover { background: rgba(239,68,68,0.15); border-color: rgba(239,68,68,0.3); color: #ef4444; }
+    .cart-items { flex: 1; overflow-y: auto; padding: 1rem 1.5rem; }
+    .cart-item {
+      display: flex; gap: 0.75rem; padding: 0.75rem 0;
+      border-bottom: 1px solid rgba(255,255,255,0.05);
+      animation: fadeInUp 0.3s ease;
+    }
+    .cart-item:last-child { border-bottom: none; }
+    .cart-item-img {
+      width: 64px; height: 64px; border-radius: 10px; object-fit: cover;
+      background: #1a1a1a; flex-shrink: 0;
+    }
+    .cart-item-info { flex: 1; min-width: 0; }
+    .cart-item-name {
+      font-size: 0.85rem; font-weight: 600; color: #fff;
+      display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden;
+      margin-bottom: 0.25rem;
+    }
+    .cart-item-price { font-size: 0.8rem; color: #e2b04a; font-weight: 700; }
+    .cart-item-qty {
+      display: flex; align-items: center; gap: 0; margin-top: 0.4rem;
+      border: 1px solid rgba(255,255,255,0.1); border-radius: 8px; overflow: hidden; width: fit-content;
+    }
+    .cart-qty-btn {
+      width: 30px; height: 30px; border: none; background: rgba(255,255,255,0.05);
+      color: #ccc; font-size: 1rem; cursor: pointer; display: flex;
+      align-items: center; justify-content: center; transition: all 0.15s;
+    }
+    .cart-qty-btn:hover { background: rgba(226,176,74,0.15); color: #e2b04a; }
+    .cart-qty-val {
+      width: 36px; height: 30px; text-align: center; border: none;
+      background: transparent; color: #fff; font-size: 0.85rem; font-weight: 600;
+      font-family: 'Cairo', sans-serif; outline: none;
+      border-left: 1px solid rgba(255,255,255,0.08); border-right: 1px solid rgba(255,255,255,0.08);
+    }
+    .cart-item-remove {
+      width: 28px; height: 28px; border-radius: 6px; border: none;
+      background: transparent; color: #666; cursor: pointer; display: flex;
+      align-items: center; justify-content: center; flex-shrink: 0;
+      transition: all 0.15s; align-self: flex-start;
+    }
+    .cart-item-remove:hover { background: rgba(239,68,68,0.15); color: #ef4444; }
+    .cart-empty {
+      text-align: center; padding: 3rem 1rem; color: #666;
+    }
+    .cart-empty svg { width: 56px; height: 56px; margin: 0 auto 1rem; opacity: 0.3; }
+    .cart-footer {
+      border-top: 1px solid rgba(255,255,255,0.08); padding: 1.25rem 1.5rem;
+      background: rgba(0,0,0,0.2);
+    }
+    .cart-total-row {
+      display: flex; justify-content: space-between; align-items: center;
+      margin-bottom: 1rem;
+    }
+    .cart-total-label { font-size: 0.9rem; color: #aaa; }
+    .cart-total-value { font-size: 1.3rem; font-weight: 800; color: #e2b04a; }
+    .cart-checkout-btn {
+      width: 100%; padding: 0.85rem; border-radius: 12px; border: none;
+      background: linear-gradient(135deg, #e2b04a, #c4952e); color: #000;
+      font-size: 1rem; font-weight: 700; cursor: pointer; transition: all 0.2s;
+      font-family: 'Cairo', sans-serif; display: flex; align-items: center;
+      justify-content: center; gap: 0.5rem;
+    }
+    .cart-checkout-btn:hover { opacity: 0.9; transform: translateY(-1px); }
+    .cart-checkout-btn:disabled { opacity: 0.4; cursor: not-allowed; transform: none; }
+    .cart-clear-btn {
+      width: 100%; padding: 0.65rem; border-radius: 10px; border: 1px solid rgba(239,68,68,0.3);
+      background: transparent; color: #ef4444; font-size: 0.85rem; font-weight: 600;
+      cursor: pointer; transition: all 0.2s; margin-top: 0.5rem;
+      font-family: 'Cairo', sans-serif;
+    }
+    .cart-clear-btn:hover { background: rgba(239,68,68,0.1); }
+    /* Checkout Modal */
+    .checkout-modal-overlay {
+      position: fixed; inset: 0; background: rgba(0,0,0,0.8); z-index: 170;
+      display: flex; align-items: center; justify-content: center;
+      opacity: 0; pointer-events: none; transition: opacity 0.3s;
+      backdrop-filter: blur(6px); padding: 1rem;
+    }
+    .checkout-modal-overlay.active { opacity: 1; pointer-events: all; }
+    .checkout-modal-box {
+      background: #141414; border: 1px solid rgba(226,176,74,0.2); border-radius: 16px;
+      padding: 2rem; width: 100%; max-width: 440px; position: relative;
+      transform: translateY(20px); transition: transform 0.3s;
+    }
+    .checkout-modal-overlay.active .checkout-modal-box { transform: translateY(0); }
+    .checkout-close {
+      position: absolute; top: 0.75rem; left: 0.75rem; background: none; border: none;
+      color: #888; cursor: pointer; padding: 0.25rem; font-size: 1.2rem; line-height: 1;
+    }
+    .checkout-close:hover { color: #fff; }
+    .checkout-total {
+      text-align: center; margin-bottom: 1.5rem;
+    }
+    .checkout-total .label { font-size: 0.85rem; color: #888; margin-bottom: 0.25rem; }
+    .checkout-total .amount { font-size: 2rem; font-weight: 800; color: #e2b04a; }
+    .instapay-link-btn {
+      display: flex; align-items: center; justify-content: center; gap: 0.6rem;
+      width: 100%; padding: 0.9rem; border-radius: 12px; border: none;
+      background: linear-gradient(135deg, #e2b04a, #c4952e); color: #000;
+      font-size: 1rem; font-weight: 700; cursor: pointer; transition: all 0.2s;
+      text-decoration: none; font-family: 'Cairo', sans-serif;
+    }
+    .instapay-link-btn:hover { opacity: 0.9; transform: translateY(-1px); }
+    .receipt-note {
+      text-align: center; margin-top: 1rem; padding: 0.75rem; border-radius: 10px;
+      background: rgba(16,185,129,0.08); border: 1px solid rgba(16,185,129,0.2);
+    }
+    .receipt-note p { font-size: 0.82rem; color: #10b981; font-weight: 600; }
+    .receipt-note .receipt-sub { font-size: 0.72rem; color: #888; margin-top: 0.25rem; }
+    /* Add to cart button in product overlay */
+    .add-to-cart-overlay-btn {
+      background: rgba(226,176,74,0.9) !important; color: #000 !important;
+    }
+    .add-to-cart-overlay-btn:hover {
+      background: #e2b04a !important;
+    }
+    /* Cart Light Mode */
+    [data-theme="light"] .cart-panel { background: #fff; border-color: #e5e5e5; }
+    [data-theme="light"] .cart-panel-header { border-color: #f0f0f0; background: #fafafa; }
+    [data-theme="light"] .cart-item { border-color: #f0f0f0; }
+    [data-theme="light"] .cart-item-name { color: #1a1a1a; }
+    [data-theme="light"] .cart-item-qty { border-color: #ddd; }
+    [data-theme="light"] .cart-qty-btn { background: #f5f5f5; color: #555; }
+    [data-theme="light"] .cart-qty-btn:hover { background: rgba(196,149,46,0.1); color: #c4952e; }
+    [data-theme="light"] .cart-qty-val { color: #1a1a1a; border-color: #e5e5e5; }
+    [data-theme="light"] .cart-footer { border-color: #f0f0f0; background: #fafafa; }
+    [data-theme="light"] .cart-total-label { color: #888; }
+    [data-theme="light"] .checkout-modal-box { background: #fff; border-color: #e5e5e5; }
+    [data-theme="light"] .receipt-note { background: rgba(16,185,129,0.05); border-color: rgba(16,185,129,0.15); }
   </style>
   <!-- Three.js STL Viewer -->
   <script type="importmap">
@@ -541,6 +712,11 @@
                 </button>
               </div>
             </div>
+            <!-- Cart Button -->
+            <button onclick="openCart()" class="cart-icon-btn p-2 rounded-lg bg-white/5 hover:bg-white/10 transition-colors" title="عربة التسوق">
+              <svg class="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="9" cy="21" r="1"/><circle cx="20" cy="21" r="1"/><path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"/></svg>
+              <span class="cart-badge" id="cartBadge"></span>
+            </button>
             <!-- Admin Button -->
             <button onclick="openAdmin()" class="p-2 rounded-lg bg-white/5 hover:bg-white/10 transition-colors" title="لوحة التحكم">
               <svg class="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
@@ -580,6 +756,10 @@
               <span id="mobileUserBtnText">تسجيل الدخول</span>
             </button>
           </div>
+          <button onclick="openCart(); closeMenu();" class="flex items-center gap-2 text-white/80 hover:text-gold py-2 transition-colors w-full text-right">
+            <svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="9" cy="21" r="1"/><circle cx="20" cy="21" r="1"/><path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"/></svg>
+            <span>عربة التسوق (<span id="cartBadgeMobile">0</span>)</span>
+          </button>
           <button onclick="openAdmin(); closeMenu();" class="flex items-center gap-2 text-white/80 hover:text-gold py-2 transition-colors w-full text-right">
             <svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
               <circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/>
@@ -917,11 +1097,19 @@
             <svg class="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.38 8.38 0 0 1-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.38 8.38 0 0 1 3.8-.9h.5a8.48 8.48 0 0 1 8 8v.5z"/></svg>
             اطلب عبر واتساب
           </a>
-          <button id="modalShareBtn" onclick="shareProduct(currentModalProductId)"
-             class="flex items-center justify-center gap-2 bg-white/10 hover:bg-white/20 text-white font-bold py-3 rounded-xl text-sm transition-all w-full mt-2">
-            <svg class="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="18" cy="5" r="3"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="19" r="3"/><line x1="8.59" y1="13.51" x2="15.42" y2="17.49"/><line x1="15.41" y1="6.51" x2="8.59" y2="10.49"/></svg>
-            مشاركة المنتج
-          </button>
+          <div style="display:flex;gap:0.5rem;margin-top:0.5rem">
+            <button id="modalAddCartBtn" onclick="addToCart(currentModalProductId)"
+               class="flex items-center justify-center gap-2 font-bold py-3 rounded-xl text-sm transition-all flex-1 border-none cursor-pointer"
+               style="background:linear-gradient(135deg,#e2b04a,#c4952e);color:#000">
+              <svg class="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><circle cx="9" cy="21" r="1"/><circle cx="20" cy="21" r="1"/><path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"/></svg>
+              أضف للسلة
+            </button>
+            <button id="modalShareBtn" onclick="shareProduct(currentModalProductId)"
+               class="flex items-center justify-center gap-2 bg-white/10 hover:bg-white/20 text-white font-bold py-3 rounded-xl text-sm transition-all border-none cursor-pointer"
+               style="width:48px;flex-shrink:0">
+              <svg class="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="18" cy="5" r="3"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="19" r="3"/><line x1="8.59" y1="13.51" x2="15.42" y2="17.49"/><line x1="15.41" y1="6.51" x2="8.59" y2="10.49"/></svg>
+            </button>
+          </div>
         </div>
       </div>
     </div>
@@ -1202,6 +1390,58 @@
 .infill-opt:hover { border-color: rgba(255,255,255,0.2) !important; background: rgba(255,255,255,0.05) !important; }
 .infill-opt.active { border-color: #e2b04a !important; background: rgba(226,176,74,0.1) !important; color: #e2b04a !important; }
 </style>
+
+<!-- Cart Slide Panel -->
+<div class="cart-modal-overlay" id="cartOverlay" onclick="if(event.target===this)closeCart()">
+  <div class="cart-panel">
+    <div class="cart-panel-header">
+      <h3><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="9" cy="21" r="1"/><circle cx="20" cy="21" r="1"/><path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"/></svg> عربة التسوق</h3>
+      <button class="cart-panel-close" onclick="closeCart()"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg></button>
+    </div>
+    <div class="cart-items" id="cartItemsContainer"></div>
+    <div class="cart-footer" id="cartFooter" style="display:none">
+      <div class="cart-total-row">
+        <span class="cart-total-label">الإجمالي</span>
+        <span class="cart-total-value" id="cartTotalValue">LE 0</span>
+      </div>
+      <button class="cart-checkout-btn" id="cartCheckoutBtn" onclick="openCheckout()">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="1" y="4" width="22" height="16" rx="2" ry="2"/><line x1="1" y1="10" x2="23" y2="10"/></svg>
+        إتمام الشراء
+      </button>
+      <button class="cart-clear-btn" onclick="clearCart()">تفريغ السلة</button>
+    </div>
+  </div>
+</div>
+
+<!-- Checkout Modal (InstaPay) -->
+<div class="checkout-modal-overlay" id="checkoutOverlay" onclick="if(event.target===this)closeCheckout()">
+  <div class="checkout-modal-box">
+    <button class="checkout-close" onclick="closeCheckout()">&times;</button>
+    <div style="text-align:center;margin-bottom:1.5rem">
+      <div style="width:56px;height:56px;border-radius:50%;background:linear-gradient(135deg,#e2b04a,#c4952e);display:flex;align-items:center;justify-content:center;margin:0 auto 1rem"><svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="#000" stroke-width="2"><rect x="1" y="4" width="22" height="16" rx="2" ry="2"/><line x1="1" y1="10" x2="23" y2="10"/></svg></div>
+      <h3 style="font-size:1.2rem;font-weight:700;margin-bottom:0.25rem">إتمام الدفع</h3>
+    </div>
+    <div class="checkout-total">
+      <div class="label">إجمالي المبلغ المطلوب</div>
+      <div class="amount" id="checkoutTotalAmount">LE 0</div>
+    </div>
+    <div id="checkoutItemsSummary" style="margin-bottom:1.25rem;max-height:150px;overflow-y:auto;padding:0.75rem;border-radius:10px;background:rgba(255,255,255,0.03);border:1px solid rgba(255,255,255,0.06);font-size:0.8rem;color:#aaa"></div>
+    <a id="instapayLink" href="https://ipn.eg/S/mosalahtvisagold/instapay/0zzqg5" target="_blank" rel="noopener noreferrer" class="instapay-link-btn">
+      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 12h-4l-3 9L9 3l-3 9H2"/></svg>
+      تحويل المبلغ عبر InstaPay
+    </a>
+    <div class="receipt-note">
+      <p>📸 ابعت صورة الإيصال</p>
+      <p class="receipt-sub">بعد التحويل، ارسل صورة الإيصال عبر واتساب لتأكيد الطلب</p>
+    </div>
+    <a id="checkoutWhatsAppBtn" href="#" target="_blank"
+       style="display:flex;align-items:center;justify-content:center;gap:0.5rem;width:100%;padding:0.75rem;border-radius:10px;border:1px solid rgba(37,211,102,0.3);background:rgba(37,211,102,0.08);color:#25d366;font-weight:600;font-size:0.9rem;text-decoration:none;margin-top:0.75rem;transition:all 0.2s;font-family:'Cairo',sans-serif"
+       onmouseover="this.style.background='rgba(37,211,102,0.15)'" onmouseout="this.style.background='rgba(37,211,102,0.08)'">
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.38 8.38 0 0 1-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.38 8.38 0 0 1 3.8-.9h.5a8.48 8.48 0 0 1 8 8v.5z"/></svg>
+      إرسال الإيصال عبر واتساب
+    </a>
+  </div>
+</div>
 
 <!-- User Auth Modal -->
 <div class="auth-modal-overlay" id="authModalOverlay" onclick="if(event.target===this)hideAuthModal()">
@@ -2356,10 +2596,15 @@
         + '<button onclick="event.stopPropagation();shareProduct(\'' + (product.id || '') + '\')" style="position:absolute;top:8px;left:8px;z-index:10;width:34px;height:34px;display:flex;align-items:center;justify-content:center;border-radius:50%;background:rgba(226,176,74,0.85);color:#fff;border:none;cursor:pointer;backdrop-filter:blur(4px);transition:transform .15s" title="مشاركة المنتج" onmousedown="this.style.transform=\'scale(0.85)\'" onmouseup="this.style.transform=\'scale(1)\'" onmouseleave="this.style.transform=\'scale(1)\'">'
         + '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><circle cx="18" cy="5" r="3"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="19" r="3"/><line x1="8.59" y1="13.51" x2="15.42" y2="17.49"/><line x1="15.41" y1="6.51" x2="8.59" y2="10.49"/></svg>'
         + '</button>'
-        + '<div class="product-overlay absolute inset-0 bg-black/50 flex items-center justify-center opacity-0 transition-opacity duration-300">'
+        + '<div class="product-overlay absolute inset-0 bg-black/50 flex items-center justify-center opacity-0 transition-opacity duration-300" style="gap:0.5rem">'
+        + '<button onclick="event.stopPropagation();addToCart(\'' + (product.id || '') + '\')"'
+        + ' class="add-to-cart-overlay-btn text-xs font-bold px-3 py-2 rounded-lg flex items-center gap-1.5 transition-colors border-none cursor-pointer"'
+        + '><svg class="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><circle cx="9" cy="21" r="1"/><circle cx="20" cy="21" r="1"/><path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"/></svg>'
+        + 'أضف للسلة'
+        + '</button>'
         + '<a href="' + getWhatsAppProductLink(product) + '" target="_blank" rel="noopener noreferrer" onclick="event.stopPropagation()"'
-        + ' class="bg-green-600 hover:bg-green-700 text-white text-xs font-bold px-4 py-2 rounded-lg flex items-center gap-1.5 transition-colors">'
-        + '<svg class="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.38 8.38 0 0 1-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.38 8.38 0 0 1 3.8-.9h.5a8.48 8.48 0 0 1 8 8v.5z"/></svg>'
+        + ' class="bg-green-600 hover:bg-green-700 text-white text-xs font-bold px-3 py-2 rounded-lg flex items-center gap-1.5 transition-colors"'
+        + '><svg class="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.38 8.38 0 0 1-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.38 8.38 0 0 1 3.8-.9h.5a8.48 8.48 0 0 1 8 8v.5z"/></svg>'
         + 'اطلب عبر واتساب'
         + '</a>'
         + '</div>'
@@ -2521,10 +2766,14 @@
         if (materials.length > 0) {
           var firstMat = materials[0];
           var firstPrice = Math.round(product.weightInGrams * firstMat.pricePerGram * 100) / 100;
+          _modalSelectedPrice = firstPrice;
+          _modalSelectedMatName = firstMat.name;
           document.getElementById('modalWhatsApp').href = getWhatsAppProductLink(product, firstMat.name, formatPrice(firstPrice));
           document.getElementById('modalPrice').textContent = formatPrice(firstPrice);
         }
       } else {
+        _modalSelectedPrice = null;
+        _modalSelectedMatName = null;
         weightCalcDiv.style.display = 'none';
         document.getElementById('modalPrice').textContent = formatPrice(product.price);
         if (hasDiscount) {
@@ -2542,12 +2791,17 @@
       document.body.style.overflow = 'hidden';
     }
 
+    var _modalSelectedPrice = null;
+    var _modalSelectedMatName = null;
+
     function selectMaterial(el, price, matName) {
       document.querySelectorAll('.material-option').forEach(function(o){o.style.borderColor='rgba(255,255,255,0.08)';o.style.background='rgba(255,255,255,0.02)';});
       el.style.borderColor = '#e2b04a';
       el.style.background = 'rgba(226,176,74,0.08)';
       el.querySelector('input[type=radio]').checked = true;
       document.getElementById('modalPrice').textContent = formatPrice(price);
+      _modalSelectedPrice = price;
+      _modalSelectedMatName = matName;
       var product = (data.products||[]).find(function(p){return p.id===currentModalProductId;});
       if (product) document.getElementById('modalWhatsApp').href = getWhatsAppProductLink(product, matName, formatPrice(price));
     }
@@ -4385,6 +4639,185 @@
       if (el.id === 'authRegName' || el.id === 'authRegPhone' || el.id === 'authRegPassword' || el.id === 'authRegConfirm') userRegister();
     });
 
+    // ============ SHOPPING CART ============
+    var cart = [];
+    var INSTAPAY_URL = 'https://ipn.eg/S/mosalahtvisagold/instapay/0zzqg5';
+
+    function loadCart() {
+      try {
+        var stored = localStorage.getItem('brq_cart');
+        if (stored) cart = JSON.parse(stored);
+        if (!Array.isArray(cart)) cart = [];
+      } catch(e) { cart = []; }
+      updateCartBadge();
+    }
+
+    function saveCart() {
+      localStorage.setItem('brq_cart', JSON.stringify(cart));
+      updateCartBadge();
+    }
+
+    function updateCartBadge() {
+      var total = 0;
+      cart.forEach(function(item) { total += (item.qty || 1); });
+      var badge = document.getElementById('cartBadge');
+      var mobileBadge = document.getElementById('cartBadgeMobile');
+      if (badge) badge.textContent = total > 0 ? total : '';
+      if (mobileBadge) mobileBadge.textContent = total;
+    }
+
+    function getCartTotal() {
+      var total = 0;
+      cart.forEach(function(item) { total += (item.price || 0) * (item.qty || 1); });
+      return total;
+    }
+
+    function addToCart(productId) {
+      if (!data || !data.products) return;
+      var product = data.products.find(function(p) { return p.id === productId; });
+      if (!product) { showToast('المنتج غير موجود', 'error'); return; }
+
+      var itemPrice = product.price;
+      var itemName = product.name;
+
+      // For weight-based pricing products from modal, use selected material price
+      if (product.useWeightPricing && product.weightInGrams > 0) {
+        if (_modalSelectedPrice !== null && productId === currentModalProductId) {
+          itemPrice = Math.round(_modalSelectedPrice * 100) / 100;
+          itemName = product.name + ' (' + (_modalSelectedMatName || '') + ')';
+        } else {
+          showToast('افتح المنتج واختر الخامة أولاً', 'error');
+          return;
+        }
+      }
+
+      var existing = cart.find(function(item) { return item.productId === productId && item.price === itemPrice; });
+      if (existing) {
+        existing.qty = (existing.qty || 1) + 1;
+        showToast('تم زيادة الكمية ✓', 'success');
+      } else {
+        cart.push({
+          productId: productId,
+          name: itemName,
+          price: itemPrice,
+          image: product.image,
+          qty: 1,
+          addedAt: Date.now()
+        });
+        showToast('تمت الإضافة للسلة ✓', 'success');
+      }
+      saveCart();
+    }
+
+    function removeFromCart(idx) {
+      cart.splice(idx, 1);
+      saveCart();
+      renderCartItems();
+    }
+
+    function updateCartQty(idx, newQty) {
+      var item = cart[idx];
+      if (!item) return;
+      newQty = parseInt(newQty) || 1;
+      if (newQty < 1) newQty = 1;
+      if (newQty > 99) newQty = 99;
+      item.qty = newQty;
+      saveCart();
+      renderCartItems();
+    }
+
+    function clearCart() {
+      if (!confirm('تفريغ السلة بالكامل؟')) return;
+      cart = [];
+      saveCart();
+      renderCartItems();
+      showToast('تم تفريغ السلة', 'success');
+    }
+
+    function openCart() {
+      renderCartItems();
+      document.getElementById('cartOverlay').classList.add('active');
+      document.body.style.overflow = 'hidden';
+    }
+
+    function closeCart() {
+      document.getElementById('cartOverlay').classList.remove('active');
+      document.body.style.overflow = '';
+    }
+
+    function renderCartItems() {
+      var container = document.getElementById('cartItemsContainer');
+      var footer = document.getElementById('cartFooter');
+
+      if (cart.length === 0) {
+        container.innerHTML = '<div class="cart-empty"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="9" cy="21" r="1"/><circle cx="20" cy="21" r="1"/><path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"/></svg><p>السلة فارغة</p></div>';
+        footer.style.display = 'none';
+        return;
+      }
+
+      footer.style.display = 'block';
+      var total = getCartTotal();
+      document.getElementById('cartTotalValue').textContent = formatPrice(total);
+
+      var html = '';
+      cart.forEach(function(item, idx) {
+        html += '<div class="cart-item">'
+          + '<img class="cart-item-img" src="' + item.image + '" alt="" onerror="this.style.display=\'none\'">'
+          + '<div class="cart-item-info">'
+          + '<div class="cart-item-name">' + escapeHtml(item.name) + '</div>'
+          + '<div class="cart-item-price">' + formatPrice(item.price) + '</div>'
+          + '<div class="cart-item-qty">'
+          + '<button class="cart-qty-btn" onclick="updateCartQty(' + idx + ',' + ((item.qty || 1) - 1) + ')">−</button>'
+          + '<input type="number" class="cart-qty-val" value="' + (item.qty || 1) + '" min="1" max="99" onchange="updateCartQty(' + idx + ',this.value)">'
+          + '<button class="cart-qty-btn" onclick="updateCartQty(' + idx + ',' + ((item.qty || 1) + 1) + ')">+</button>'
+          + '</div></div>'
+          + '<button class="cart-item-remove" onclick="removeFromCart(' + idx + ')" title="حذف"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/></svg></button>'
+          + '</div>';
+      });
+      container.innerHTML = html;
+    }
+
+    // ============ CHECKOUT ============
+    function openCheckout() {
+      if (cart.length === 0) return;
+      var total = getCartTotal();
+      document.getElementById('checkoutTotalAmount').textContent = formatPrice(total);
+
+      // Build items summary
+      var summaryHtml = '';
+      cart.forEach(function(item) {
+        summaryHtml += '<div style="display:flex;justify-content:space-between;padding:0.25rem 0">'
+          + '<span style="color:#ccc">' + escapeHtml(item.name) + ' ×' + (item.qty || 1) + '</span>'
+          + '<span style="color:#e2b04a;font-weight:600">' + formatPrice(item.price * (item.qty || 1)) + '</span>'
+          + '</div>';
+      });
+      document.getElementById('checkoutItemsSummary').innerHTML = summaryHtml;
+
+      // Build WhatsApp message with order details for receipt
+      var waMsg = '📋 طلب شراء من الموقع:\n';
+      cart.forEach(function(item) {
+        waMsg += '• ' + item.name + ' ×' + (item.qty || 1) + ' = ' + formatPrice(item.price * (item.qty || 1)) + '\n';
+      });
+      waMsg += '\n💰 الإجمالي: ' + formatPrice(total);
+      waMsg += '\n\n📸 ابعت صورة إيصال التحويل لتأكيد الطلب';
+      if (currentUser) {
+        waMsg += '\n\n👤 الحساب: ' + currentUser.name + ' (' + currentUser.phone + ')';
+      }
+      document.getElementById('checkoutWhatsAppBtn').href = getWhatsAppLink() + '&text=' + encodeURIComponent(waMsg);
+
+      // Close cart, open checkout
+      closeCart();
+      setTimeout(function() {
+        document.getElementById('checkoutOverlay').classList.add('active');
+        document.body.style.overflow = 'hidden';
+      }, 100);
+    }
+
+    function closeCheckout() {
+      document.getElementById('checkoutOverlay').classList.remove('active');
+      document.body.style.overflow = '';
+    }
+
     // ============ ADMIN CUSTOMERS TAB ============
     async function renderAdminCustomers() {
       var container = document.getElementById('adminCustomersList');
@@ -4472,7 +4905,7 @@
     // ============ INIT ============
     window.addEventListener('scroll', handleNavScroll);
     window.addEventListener('keydown', (e) => {
-      if (e.key === 'Escape') closeModal();
+      if (e.key === 'Escape') { closeModal(); closeCart(); closeCheckout(); hideAuthModal(); }
     });
 
     document.addEventListener('DOMContentLoaded', async () => {
@@ -4482,6 +4915,9 @@
       // Init user session
       initUserSession();
       updateUserUI();
+
+      // Init cart
+      loadCart();
 
       // Track visitor (only on main site)
       if (window.location.hash !== '#admin') trackVisitor();
