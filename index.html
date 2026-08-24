@@ -911,6 +911,7 @@
           </div>
           <!-- Material + Infill -->
           <div id="stlOptions" style="display:none" class="mt-6">
+            <div id="stlColorSection" class="mb-4" style="display:none"><label class="block text-sm font-bold mb-2">🎨 لون الطباعة</label><div id="stlColorOptions" style="display:flex;flex-wrap:wrap;gap:0.5rem"></div></div>
             <div class="mb-4"><label class="block text-sm font-bold mb-2">اختر الخامة</label><div id="stlMaterialOptions" style="display:grid;grid-template-columns:1fr;gap:0.5rem"></div></div>
             <div class="mb-6"><label class="block text-sm font-bold mb-2">نسبة الحشو (Infill)</label><div style="display:flex;gap:0.5rem;flex-wrap:wrap"><label style="flex:1;min-width:80px;text-align:center;padding:0.6rem 0.5rem;border-radius:10px;border:1px solid rgba(255,255,255,0.08);cursor:pointer;font-size:0.85rem;color:#fff;transition:all .2s;background:rgba(255,255,255,0.02)" class="infill-opt" onclick="selectInfill(this,20)"><div style="font-weight:700">20%</div><div style="font-size:0.65rem;color:#888">اقتصادي</div></label><label style="flex:1;min-width:80px;text-align:center;padding:0.6rem 0.5rem;border-radius:10px;border:1px solid rgba(255,255,255,0.08);cursor:pointer;font-size:0.85rem;color:#fff;transition:all .2s;background:rgba(255,255,255,0.02)" class="infill-opt" onclick="selectInfill(this,50)"><div style="font-weight:700">50%</div><div style="font-size:0.65rem;color:#888">متوازن</div></label><label style="flex:1;min-width:80px;text-align:center;padding:0.6rem 0.5rem;border-radius:10px;border:1px solid rgba(255,255,255,0.08);cursor:pointer;font-size:0.85rem;color:#fff;transition:all .2s;background:rgba(255,255,255,0.02)" class="infill-opt" onclick="selectInfill(this,80)"><div style="font-weight:700">80%</div><div style="font-size:0.65rem;color:#888">قوي</div></label><label style="flex:1;min-width:80px;text-align:center;padding:0.6rem 0.5rem;border-radius:10px;border:1px solid rgba(255,255,255,0.08);cursor:pointer;font-size:0.85rem;color:#fff;transition:all .2s;background:rgba(255,255,255,0.02)" class="infill-opt" onclick="selectInfill(this,100)"><div style="font-weight:700">100%</div><div style="font-size:0.65rem;color:#888">صلد</div></label></div></div>
             <!-- Price Display -->
@@ -1564,6 +1565,16 @@
               <div style="display:flex;align-items:center;gap:0.5rem">
                 <input type="number" id="settingSupportWaste" min="0" max="100" step="1" style="width:80px;text-align:center" placeholder="15">
                 <span style="color:#888;font-size:0.85rem">% — تُضاف على سعر طباعة STL كضمان للسابورت والهدر</span>
+              </div>
+            </div>
+            <div class="admin-form-group">
+              <label>ألوان الطباعة (STL)</label>
+              <p style="color:#888;font-size:0.78rem;margin-bottom:0.75rem">أضف الألوان المتاحة للطباعة — المستخدم هيختار منهم</p>
+              <div id="printColorsList" style="display:flex;flex-wrap:wrap;gap:0.5rem;margin-bottom:0.75rem"></div>
+              <div style="display:flex;align-items:center;gap:0.5rem;flex-wrap:wrap">
+                <input type="color" id="newPrintColor" value="#e2b04a" style="width:40px;height:34px;border:none;border-radius:8px;cursor:pointer;background:transparent;padding:0">
+                <input type="text" id="newPrintColorName" placeholder="اسم اللون (مثال: ذهبي)" style="flex:1;min-width:150px">
+                <button class="admin-btn admin-btn-primary admin-btn-sm" onclick="addPrintColor()">+</button>
               </div>
             </div>
             <button class="admin-btn admin-btn-primary" onclick="saveSettings()"><svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" viewBox="0 0 24 24"><path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"/><polyline points="17 21 17 13 7 13 7 21"/><polyline points="7 3 7 8 15 8"/></svg>حفظ الإعدادات</button>
@@ -2649,9 +2660,8 @@
         + '<input type="number" class="pcard-qty-val" id="pcardQty_' + pid + '" value="1" min="1" max="99" onchange="pcardQtyInput(\'' + pid + '\',this.value)" onclick="event.stopPropagation()">'
         + '<button class="pcard-qty-btn" onclick="pcardQtyChange(\'' + pid + '\',1)">+</button>'
         + '</div>'
-        + '<button class="pcard-cart-btn" onclick="addToCartWithQty(\'' + pid + '\')"' + (isWP ? ' disabled title="افتح المنتج واختر الخامة أولاً"' : '') + '>'
-        + '<svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><circle cx="9" cy="21" r="1"/><circle cx="20" cy="21" r="1"/><path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"/></svg>'
-        + 'أضف للسلة'
+        + '<button class="pcard-cart-btn" onclick="addToCartWithQty(\'' + pid + '\')"' + (isWP ? ' disabled title="افتح المنتج واختر الخامة أولاً"' : '') + ' style="width:28px;flex:unset;min-width:28px;padding:0" title="أضف للسلة">'
+        + '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><circle cx="9" cy="21" r="1"/><circle cx="20" cy="21" r="1"/><path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"/></svg>'
         + '</button>'
         + '<a href="' + getWhatsAppProductLink(product) + '" target="_blank" rel="noopener noreferrer" class="pcard-wa-btn" title="اطلب واتساب">'
         + '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.38 8.38 0 0 1-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.38 8.38 0 0 1 3.8-.9h.5a8.48 8.48 0 0 1 8 8v.5z"/></svg>'
@@ -3128,9 +3138,49 @@
       document.getElementById('settingSiteNameEn').value = s.siteNameEn || 'متجر 3D ڤيچن';
       document.getElementById('settingDefaultTheme').value = s.defaultTheme || 'dark';
       document.getElementById('settingSupportWaste').value = s.supportWastePercent != null ? s.supportWastePercent : 15;
+      renderPrintColors();
       var preview = document.getElementById('logoPreviewArea');
       if (s.logo) { preview.innerHTML = '<img src="'+s.logo+'" alt="Logo">'; }
       else { preview.innerHTML = '<svg width="32" height="32" fill="none" stroke="#555" stroke-width="1.5" viewBox="0 0 24 24"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><path d="M21 15l-5-5L5 21"/></svg>'; }
+    }
+
+    function renderPrintColors() {
+      var container = document.getElementById('printColorsList');
+      if (!container) return;
+      var colors = (data.settings && data.settings.printColors) || [];
+      if (colors.length === 0) {
+        container.innerHTML = '<span style="color:#666;font-size:0.8rem">لم يتم إضافة ألوان بعد</span>';
+        return;
+      }
+      var html = '';
+      colors.forEach(function(c, idx) {
+        html += '<div style="display:flex;align-items:center;gap:0.4rem;padding:0.35rem 0.6rem;border-radius:8px;border:1px solid rgba(255,255,255,0.1);background:rgba(255,255,255,0.03);font-size:0.8rem">'
+          + '<div style="width:22px;height:22px;border-radius:6px;background:' + c.hex + ';border:1px solid rgba(255,255,255,0.15);flex-shrink:0"></div>'
+          + '<span style="color:#ccc">' + escapeHtml(c.name) + '</span>'
+          + '<button onclick="removePrintColor(' + idx + ')" style="background:none;border:none;color:#ef4444;cursor:pointer;padding:0 2px;font-size:0.9rem;line-height:1" title="حذف">&times;</button>'
+          + '</div>';
+      });
+      container.innerHTML = html;
+    }
+
+    function addPrintColor() {
+      if (!data.settings) data.settings = {};
+      if (!data.settings.printColors) data.settings.printColors = [];
+      var hex = document.getElementById('newPrintColor').value;
+      var name = document.getElementById('newPrintColorName').value.trim();
+      if (!name) { showToast('أدخل اسم اللون', 'error'); return; }
+      data.settings.printColors.push({ hex: hex, name: name });
+      document.getElementById('newPrintColorName').value = '';
+      saveData('settings');
+      renderPrintColors();
+      showToast('تم إضافة اللون ✓', 'success');
+    }
+
+    function removePrintColor(idx) {
+      if (!data.settings || !data.settings.printColors) return;
+      data.settings.printColors.splice(idx, 1);
+      saveData('settings');
+      renderPrintColors();
     }
     function saveSettings() {
       if (!data.settings) data.settings = {};
@@ -3946,7 +3996,43 @@
     }
 
     // ============ STL FILE PARSER & PRICING ============
-    var stlState = { volume: 0, solidWeight: 0, fileName: '', selectedMaterial: null, selectedInfill: 20, file: null, orderMessage: '' };
+    var stlState = { volume: 0, solidWeight: 0, fileName: '', selectedMaterial: null, selectedInfill: 20, selectedColor: null, file: null, orderMessage: '' };
+
+    // ============ IndexedDB for STL File Persistence ============
+    var _idbDB = null;
+    function getIDB() {
+      if (_idbDB) return Promise.resolve(_idbDB);
+      return new Promise(function(resolve, reject) {
+        try {
+          var req = indexedDB.open('brq_stl_cache', 1);
+          req.onupgradeneeded = function(e) { e.target.result.createObjectStore('files'); };
+          req.onsuccess = function(e) { _idbDB = e.target.result; resolve(_idbDB); };
+          req.onerror = function() { reject(new Error('IndexedDB not available')); };
+        } catch(e) { reject(e); }
+      });
+    }
+    function saveSTLFileToIDB(file) {
+      getIDB().then(function(db) {
+        var tx = db.transaction('files', 'readwrite');
+        tx.objectStore('files').put(file, 'last_stl');
+      }).catch(function() {});
+    }
+    function loadSTLFileFromIDB() {
+      return getIDB().then(function(db) {
+        return new Promise(function(resolve, reject) {
+          var tx = db.transaction('files', 'readonly');
+          var req = tx.objectStore('files').get('last_stl');
+          req.onsuccess = function() { resolve(req.result || null); };
+          req.onerror = function() { resolve(null); };
+        });
+      }).catch(function() { return Promise.resolve(null); });
+    }
+    function clearSTLFileFromIDB() {
+      getIDB().then(function(db) {
+        var tx = db.transaction('files', 'readwrite');
+        tx.objectStore('files').delete('last_stl');
+      }).catch(function() {});
+    }
 
     function parseSTLFile(file) {
       return new Promise(function(resolve, reject) {
@@ -4019,6 +4105,8 @@
       }
       stlState.fileName = file.name.replace(/\.stl$/i, '');
       stlState.file = file;
+      // Persist file to IndexedDB so it survives page reload
+      saveSTLFileToIDB(file);
       // Show loading
       document.getElementById('stlUploadIcon').innerHTML = '<div style="width:24px;height:24px;border:3px solid rgba(226,176,74,0.2);border-top-color:#e2b04a;border-radius:50%;animation:spin 1s linear infinite"></div>';
       document.getElementById('stlUploadText').textContent = 'جاري تحليل الملف...';
@@ -4070,6 +4158,22 @@
           + '</label>';
       });
       document.getElementById('stlMaterialOptions').innerHTML = html;
+      // Build color options from admin settings
+      var printColors = (data.settings && data.settings.printColors) || [];
+      if (printColors.length > 0) {
+        var colorHtml = '';
+        printColors.forEach(function(c, idx) {
+          var sel = idx === 0 ? 'border-color:#fff;box-shadow:0 0 0 2px rgba(226,176,74,0.6)' : 'border-color:transparent';
+          colorHtml += '<button onclick="selectPrintColor(this,' + idx + ')" title="' + escapeHtml(c.name) + '" style="width:36px;height:36px;border-radius:10px;background:' + c.hex + ';border:2px solid ' + (idx === 0 ? '#fff' : 'transparent') + ';cursor:pointer;transition:all .15s;position:relative;box-shadow:' + (idx === 0 ? '0 0 0 2px rgba(226,176,74,0.6)' : 'none') + '" class="stl-color-opt" data-idx="' + idx + '"></button>';
+        });
+        document.getElementById('stlColorOptions').innerHTML = colorHtml;
+        document.getElementById('stlColorSection').style.display = 'block';
+        stlState.selectedColor = printColors[0];
+        // Apply first color to 3D model
+        if (window.changeSTLInlineColor) window.changeSTLInlineColor(printColors[0].hex);
+      } else {
+        document.getElementById('stlColorSection').style.display = 'none';
+      }
       // Auto-select first material
       if (materials.length > 0) {
         var firstMat = materials[0];
@@ -4123,6 +4227,30 @@
       }
     }
 
+    function selectPrintColor(el, idx) {
+      var colors = (data.settings && data.settings.printColors) || [];
+      if (!colors[idx]) return;
+      stlState.selectedColor = colors[idx];
+      document.querySelectorAll('.stl-color-opt').forEach(function(b) {
+        b.style.borderColor = 'transparent';
+        b.style.boxShadow = 'none';
+      });
+      el.style.borderColor = '#fff';
+      el.style.boxShadow = '0 0 0 2px rgba(226,176,74,0.6)';
+      // Change 3D model color
+      if (window.changeSTLInlineColor) window.changeSTLInlineColor(colors[idx].hex);
+      // Rebuild order message with new color
+      if (stlState.selectedMaterial) {
+        var mat = stlState.selectedMaterial;
+        var actualWeight = calcWeightWithInfill(stlState.solidWeight, stlState.selectedInfill);
+        var basePrice = Math.round(actualWeight * mat.pricePerGram * 100) / 100;
+        var supportPct = (data.settings && data.settings.supportWastePercent != null) ? data.settings.supportWastePercent : 15;
+        var supportAmount = Math.round(basePrice * supportPct / 100 * 100) / 100;
+        var totalPrice = Math.round((basePrice + supportAmount) * 100) / 100;
+        stlState.orderMessage = 'أريد طلب طباعة 3D مخصص\n📁 الملف: ' + stlState.fileName + (stlState.selectedColor ? '\n🎨 اللون: ' + stlState.selectedColor.name : '') + '\n🧱 الخامة: ' + mat.name + '\n⚖️ الوزن التقريبي: ' + actualWeight.toFixed(1) + ' جرام\n🔄 نسبة الحشو: ' + stlState.selectedInfill + '%\n💰 السعر التقريبي: ' + formatPrice(totalPrice);
+      }
+    }
+
     function updateWeightDisplay(solidWeight, mat) {
       // Weight display hidden from UI — calculated internally only
     }
@@ -4137,15 +4265,39 @@
       document.getElementById('stlPriceDisplay').textContent = formatPrice(totalPrice);
       document.getElementById('stlPriceBreakdown').textContent = 'حشو ' + stlState.selectedInfill + '%';
       // Store the message for sending later
-      stlState.orderMessage = 'أريد طلب طباعة 3D مخصص\n📁 الملف: ' + stlState.fileName + '\n🧱 الخامة: ' + mat.name + '\n⚖️ الوزن التقريبي: ' + actualWeight.toFixed(1) + ' جرام\n🔄 نسبة الحشو: ' + stlState.selectedInfill + '%\n💰 السعر التقريبي: ' + formatPrice(totalPrice);
+      stlState.orderMessage = 'أريد طلب طباعة 3D مخصص\n📁 الملف: ' + stlState.fileName + (stlState.selectedColor ? '\n🎨 اللون: ' + stlState.selectedColor.name : '') + '\n🧱 الخامة: ' + mat.name + '\n⚖️ الوزن التقريبي: ' + actualWeight.toFixed(1) + ' جرام\n🔄 نسبة الحشو: ' + stlState.selectedInfill + '%\n💰 السعر التقريبي: ' + formatPrice(totalPrice);
       // Show order button
       var btnText = document.getElementById('stlOrderBtnText');
       btnText.textContent = 'اطلب عبر واتساب';
       document.getElementById('stlOrderBtn').style.display = 'flex';
     }
 
+    // Restore STL from IndexedDB on page load
+    function restoreSTLFromFile() {
+      loadSTLFileFromIDB().then(function(file) {
+        if (!file || !(file instanceof File)) return;
+        // Validate file still looks like STL
+        if (!file.name.toLowerCase().endsWith('.stl')) return;
+        stlState.fileName = file.name.replace(/\.stl$/i, '');
+        stlState.file = file;
+        document.getElementById('stlUploadIcon').innerHTML = '<div style="width:24px;height:24px;border:3px solid rgba(226,176,74,0.2);border-top-color:#e2b04a;border-radius:50%;animation:spin 1s linear infinite"></div>';
+        document.getElementById('stlUploadText').textContent = 'جاري استعادة الملف...';
+        document.getElementById('stlDropZone').style.pointerEvents = 'none';
+        parseSTLFile(file).then(function(volume) {
+          stlState.volume = volume;
+          showSTLResults(file);
+          showToast('تم استعادة الملف المحفوظ ✓', 'success');
+        }).catch(function(err) {
+          console.error('[STL Restore] Parse error:', err);
+          clearSTLFileFromIDB();
+          resetSTL();
+        });
+      });
+    }
+
     function resetSTL() {
-      stlState = { volume: 0, solidWeight: 0, fileName: '', selectedMaterial: null, selectedInfill: 20, file: null, orderMessage: '' };
+      stlState = { volume: 0, solidWeight: 0, fileName: '', selectedMaterial: null, selectedInfill: 20, selectedColor: null, file: null, orderMessage: '' };
+      clearSTLFileFromIDB();
       // Clean up inline 3D viewer
       if (window.disposeSTLInline) window.disposeSTLInline();
       document.getElementById('stlUploadIcon').innerHTML = '<svg width="28" height="28" fill="none" stroke="#e2b04a" stroke-width="1.5" viewBox="0 0 24 24"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>';
@@ -5142,6 +5294,9 @@
       // Init cart (after user session, so we know if logged in)
       loadCart();
 
+      // Restore STL file from IndexedDB if exists
+      restoreSTLFromFile();
+
       // Cleanup expired unpaid carts (runs periodically)
       cleanupExpiredCarts();
       setInterval(cleanupExpiredCarts, 30 * 60 * 1000); // every 30 min
@@ -5351,11 +5506,12 @@
     };
 
     // ============ INLINE STL VIEWER (Customer Pricing) ============
-    var _inl_scene, _inl_camera, _inl_renderer, _inl_controls, _inl_animId, _inl_ro;
+    var _inl_scene, _inl_camera, _inl_renderer, _inl_controls, _inl_animId, _inl_ro, _inl_mesh;
 
     function _inl_dispose() {
       if (_inl_animId) cancelAnimationFrame(_inl_animId);
       _inl_animId = null;
+      _inl_mesh = null;
       if (_inl_controls) { _inl_controls.dispose(); _inl_controls = null; }
       if (_inl_renderer) { _inl_renderer.dispose(); _inl_renderer.domElement.remove(); _inl_renderer = null; }
       if (_inl_scene) {
@@ -5459,6 +5615,7 @@
 
         geometry.center();
         mesh.scale.set(scale, scale, scale);
+        _inl_mesh = mesh;
         _inl_scene.add(mesh);
 
         // Camera: look at origin where model is centered
@@ -5487,6 +5644,12 @@
       var wrap = document.getElementById('stlInlineCanvas');
       if (wrap) wrap.querySelectorAll('canvas').forEach(function(c){ c.remove(); });
       _inl_dispose();
+    };
+
+    // Change the 3D model color (called from print color selector)
+    window.changeSTLInlineColor = function(hexColor) {
+      if (!_inl_mesh || !_inl_mesh.material) return;
+      _inl_mesh.material.color.set(hexColor);
     };
 
     // Close on Escape
